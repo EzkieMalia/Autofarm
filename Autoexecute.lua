@@ -1,0 +1,1076 @@
+repeat task.wait() until game:IsLoaded()
+local longstring = ([[
+local VIP = cloneref(game:GetService("VirtualInputManager"))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = cloneref(game:GetService("Players"))
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+repeat task.wait() until Player.Character
+local Character = Player.Character
+local Humanoid = Character and Character:FindFirstChild("Humanoid")
+local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+local Random = Random.new()
+
+if game.PlaceId ~= 15124180230 then
+    Player:Kick("Auto Farm Protection | This isn't supported on regular servers.")
+return end
+
+local Cycles = 0
+local MarshmallowSold = 0
+local PotatoChipsSold = 0
+local MoneyDifference = 0
+local CardsDone = 0
+local Now = os.clock()
+
+local Settings = {
+    ["Status"] = "[ Startup ] Status: none";
+    ["Autofarm Enabled"] = true;
+    ["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position);
+    ["IsHealing"] = false;
+    ["Cards Counter"] = 0;
+    ["Potato Counter"] = 0;
+    ["Ping"] = 0;
+    ["Starting Cash"] = 0;
+    ['Autocrouch Enabled'] = false;
+    ["Auto Rejoin"] = false;
+}
+
+task.spawn(function()
+    repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
+    repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
+    repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
+    local Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
+    Settings["Starting Cash"] = tonumber(Result)
+    while task.wait() do
+        if tonumber(Result) >= 1750000 then
+            Player:Kick("Auto Farm Protection | Reached Max Money.")
+        return end
+        Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
+        MoneyDifference = tonumber(Result) - Settings["Starting Cash"]
+    end
+end)
+
+task.spawn(function()
+    Player.Idled:Connect(function()
+        local VirtualUser = cloneref(game:GetService("VirtualUser"))
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+    while Settings["Autofarm Enabled"] ~= true do
+        task.wait()
+        Settings["Status"] = "[ Startup ] Status: Autofarm is stopped."
+    end
+end)
+
+task.spawn(function()
+    while Settings["Autofarm Enabled"] == true do
+        Settings["Ping"] = Player:GetNetworkPing()
+        VIP:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+        task.wait()
+        VIP:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
+        task.wait()
+        if Settings['Autocrouch Enabled'] == true then
+            VIP:SendKeyEvent(true, Enum.KeyCode.C, false, nil)
+            task.wait()
+            VIP:SendKeyEvent(false, Enum.KeyCode.C, false, nil)
+        end
+        if Humanoid.Health <= 80 then
+            Settings["IsHealing"] = true
+            Settings["Status"] = "[ Startup ] Status: Healing."
+            HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
+        else
+            Settings["IsHealing"] = false
+            if Settings["Status"] == "[ Startup ] Status: Healing." then
+                Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
+            end
+        end
+        if HumanoidRootPart.Position.Y <= -10 then
+            HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
+        end
+        task.wait()
+    end
+end)
+
+task.spawn(function()
+    while Settings["Autofarm Enabled"] == true do
+        for Index, Object in next, Players:GetChildren() do
+            if Object.Character and Object ~= Player then
+                if Object.Character:FindFirstChild("HumanoidRootPart") then
+                    local hrp1 = Object.Character:FindFirstChild("HumanoidRootPart")
+                    if (hrp1.Position - HumanoidRootPart.Position).Magnitude < 3 then
+                        local function ApplyHeaviness()
+                            task.wait()
+                            HumanoidRootPart.Anchored = true
+                            task.wait()
+                            HumanoidRootPart.Anchored = false
+                        end
+                        repeat ApplyHeaviness() until (hrp1.Position - HumanoidRootPart.Position).Magnitude >= 3
+                    end
+                end
+            end
+        end
+        task.wait()
+    end
+end)
+
+local function GetCommaValue(Number)
+    local Formatted = tostring(Number)
+    while true do
+        Formatted, Replaced = string.gsub(Formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (Replaced == 0) then
+            break
+        end
+    end
+    return Formatted
+end
+
+local function FindAvailableApartments()
+    local Available = {}
+    local Owned = {}
+    local Apartments = {"WH1"; "BH3"; "BH2"; "BH4"; "BH1"; "LT1";}
+    local CasinoApartments = {"Home 1"; "Home 2"; "Home 3"; "Home 4"}
+    for Index, Object in next, workspace:WaitForChild("Map").APTS:GetChildren() do
+        if (Object:IsA("Model")) then 
+            if table.find(Apartments, tostring(Object)) then
+                local Board = Object:FindFirstChild("Board", Model)
+                if Board.name.SurfaceGui.TextLabel.Text == "VACANT" then
+                    table.insert(Available, workspace:WaitForChild("Map").Houses[tostring(Object)])
+                elseif Board.name.SurfaceGui.TextLabel.Text == Player.Name then
+                    table.insert(Owned, workspace:WaitForChild("Map").Houses[tostring(Object)])
+                end
+            elseif table.find(CasinoApartments, tostring(Object)) then
+                local Board = Object:FindFirstChild("Board", Model)
+                if Board.name.SurfaceGui.TextLabel.Text == "VACANT" then
+                    table.insert(Available, workspace:WaitForChild("Map").Locations.Apartments[tostring(Object)])
+                elseif Board.name.SurfaceGui.TextLabel.Text == Player.Name then
+                    table.insert(Owned, workspace:WaitForChild("Map").Locations.Apartments[tostring(Object)])
+                end
+            end
+        end
+    end
+    if #Owned >= 1 then return Owned, "Owned" end
+    return Available, "Not Owned"
+end
+
+local function FindAvailableATMs()
+    local ATMs = workspace:WaitForChild("Map").ATMS
+    local AvailableATM
+    for Index, ATM in next, ATMs:GetChildren() do
+        if ATM:FindFirstChild("ATMScreen").Transparency == 0 then
+            AvailableATM = ATM
+        end
+    end
+    return AvailableATM
+end
+
+local function FindAvailableHomeless()
+    Settings["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position)
+    HumanoidRootPart.CFrame = CFrame.new(899, 4, -284)
+    task.wait(.15)
+    HumanoidRootPart.CFrame = CFrame.new(518, 4, -295)
+    task.wait(.15)
+    HumanoidRootPart.CFrame = CFrame.new(135, 8, -322)
+    task.wait(.15)
+    HumanoidRootPart.CFrame = CFrame.new(1102, 4, 529)
+    task.wait(.15)
+    HumanoidRootPart.CFrame = Settings["Old HRP Position"]
+    local Homeless = ReplicatedStorage:WaitForChild("Workspace").Homeless
+    local AvailableHomeless = {}
+    for Index, Object in next, Homeless:GetChildren() do
+        if Object:IsA("Model") then
+            local UpperTorso = Object:FindFirstChild("UpperTorso")
+            if UpperTorso.Position.Y < 2.35 and math.floor(UpperTorso.Position.Y) ~= 4 or math.floor(UpperTorso.Position.Y) ~= 3 then
+                table.insert(AvailableHomeless, Object)
+            end
+        end
+    end
+    return AvailableHomeless
+end
+
+local function StartMarshmallowFarm()
+    repeat task.wait() until Humanoid.Health > 20
+    local Apartment, Owned = FindAvailableApartments()
+    if #Apartment ~= 0 then
+        if Settings["Autofarm Enabled"] ~= true then return end
+        if Owned == "Owned" then
+            Apartment = Apartment[1]
+            Settings["Apartment"] = Apartment
+        else
+            Apartment = Apartment[Random:NextInteger(1, #Apartment)]
+            Settings["Apartment"] = Apartment
+        end
+
+        if Owned == "Not Owned" then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            local apt = workspace:WaitForChild("Map").APTS:FindFirstChild(tostring(Apartment))
+            local Board = apt:FindFirstChild("Board")
+            local Prompt = Board.backboard.ProximityPrompt
+            HumanoidRootPart.CFrame = CFrame.new(Board.backboard.Position)
+            task.wait(.75)
+            repeat
+                fireproximityprompt(Prompt)
+                task.wait(.75)
+            until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or Board.name.SurfaceGui.TextLabel.Text == tostring(Player)
+            if PlayerGui:WaitForChild("Main").BasicNotification.Text == "This apartment is already occupied!" then
+                task.spawn(StartMarshmallowFarm)
+                return false
+            end
+        end
+
+        local Lock = workspace:WaitForChild("Map").APTS:FindFirstChild(tostring(Apartment)).Door.DoorLock
+        local Knob = workspace:WaitForChild("Map").APTS:FindFirstChild(tostring(Apartment)).Door.Knob
+        local KnobPrompt = Knob.Parent.Interact.Attachment.ProximityPrompt
+
+        if Lock.Part.Rotation.Y ~= 0 and Lock.Part.Rotation.Y ~= 90 then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
+            task.wait(.5)
+            for Index = 1,5 do
+                HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
+                fireproximityprompt(KnobPrompt)
+                task.wait()
+            end
+            task.wait(.75)
+        end
+        if Lock.Part.Rotation.X ~= 90 then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
+            task.wait(.9)
+            repeat
+                HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
+                fireproximityprompt(Lock.Part.ProximityPrompt)
+                task.wait(.5)
+                fireproximityprompt(KnobPrompt)
+            until Lock.Part.Rotation.X == 90
+        end
+        task.wait(.5)
+        HumanoidRootPart.CFrame = Settings["Old HRP Position"]
+        return true
+    else
+        return false
+    end
+end
+
+local function ScavengeInventory()
+    Humanoid:UnequipTools()
+    task.wait(.05)
+    local Potato = 0
+    local Flour = 0
+    local Water = 0
+    local Gelatin = 0
+    local SugarBlockBag = 0
+    for Index, Object in next, Player:WaitForChild("Backpack"):GetChildren() do
+        if (Object.Name == "Potato") then
+            Potato += 1
+        end
+        if (Object.Name == "Flour") then
+            Flour += 1
+        end
+        if (Object.Name == "Water") then
+            Water += 1
+        end
+        if (Object.Name == "Gelatin") then
+            Gelatin += 1
+        end
+        if (Object.Name == "Sugar Block Bag") then
+            SugarBlockBag += 1
+        end
+    end
+    return Potato, Flour, Water, Gelatin, SugarBlockBag
+end
+
+local function PurchaseSkiMask()
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    Settings["Status"] = "[ Startup ] Status: Purchasing Ski-Mask."
+    Humanoid:UnequipTools()
+    task.wait(.1)
+    if not Player:WaitForChild("Backpack"):FindFirstChild("SkiMask") then
+        HumanoidRootPart.CFrame = CFrame.new(-363, 4, -321)
+        task.wait(1)
+        game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer("SkiMask")
+        repeat task.wait() until Player:WaitForChild("Backpack"):FindFirstChild("SkiMask")
+    end
+    if not Character:FindFirstChild("SkiMask") :: Accessory then
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("SkiMask"))
+        task.wait(.05)
+        local Args = {
+        	buffer.fromstring("\005"),
+            Character:WaitForChild("SkiMask")
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RPC"):FireServer(unpack(Args))
+        task.wait(.25)
+        Humanoid:UnequipTools()
+    end
+    HumanoidRootPart.CFrame = Settings["Old HRP Position"]
+    return true
+end
+
+local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+
+local function MainAutofarm()
+    Settings["Auto Rejoin"] = true
+    repeat task.wait() until Humanoid.Health > 20
+    if Settings["Apartment"] == nil then return end
+    if Settings["Autofarm Enabled"] ~= true then return end
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    local function BuyMarshIngredients()
+        Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        if (Water < 1 or Gelatin < 1 or SugarBlockBag < 1) then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            Settings["Status"] = "[ Marshmallows ] Status: Buying Marshmallow ingredients."
+            HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+            task.wait(.75)
+            if (Water < 1) then
+                if Settings["Autofarm Enabled"] ~= true then return end
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                Settings["Status"] = "[ Marshmallows ] Status: Buying Marshmallow ingredients."
+                local Arguments = {
+        	        "Water";
+                }
+                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer(unpack(Arguments))
+                task.wait(.4)
+                HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+            end
+            if (Gelatin < 1) then
+                if Settings["Autofarm Enabled"] ~= true then return end
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                Settings["Status"] = "[ Marshmallows ] Status: Buying Marshmallow ingredients."
+                local Arguments = {
+        	        "Gelatin";
+                }
+                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer(unpack(Arguments))
+                task.wait(.4)
+                HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+            end
+            if (SugarBlockBag < 1) then
+                if Settings["Autofarm Enabled"] ~= true then return end
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                Settings["Status"] = "[ Marshmallows ] Status: Buying Marshmallow ingredients."
+                local Arguments = {
+        	        "Sugar Block Bag";
+                }
+                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer(unpack(Arguments))
+                task.wait(.4)
+                HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+            end
+        end
+    end
+    BuyMarshIngredients()
+    repeat
+        Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        task.wait(.1)
+        Settings["Potato Counter"] += 1
+    until (Water >= 1 and Gelatin >= 1 and SugarBlockBag >= 1) or Settings["Potato Counter"] > 190
+    Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+    if (Water < 1 or Gelatin < 1 or SugarBlockBag < 1) then
+        repeat
+            Settings["Status"] = "[ Marshmallows ] Status: Failed to buy ingredients, trying again."
+            BuyMarshIngredients()
+            repeat
+                Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+                task.wait(.1)
+                Settings["Potato Counter"] += 1
+            until (Water >= 1 and Gelatin >= 1 and SugarBlockBag >= 1) or Settings["Potato Counter"] > 190
+            Settings["Potato Counter"] = 0
+            Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        until (Gelatin >= 1 and Water >= 1 and SugarBlockBag >= 1)
+        Settings["Status"] = "[ Marshmallows ] Status: Successfully bought ingredients."
+    else
+        Settings["Status"] = "[ Marshmallows ] Status: Successfully bought ingredients."
+    end
+    Settings["Potato Counter"] = 0
+    task.wait(.15)
+    local Stove
+    local CookPrompt
+    local Timer
+    if tostring(Settings["Apartment"]):find("Home") then
+        Stove = Settings["Apartment"]:FindFirstChild("Cooking Pot")
+        CookPrompt = Stove:FindFirstChild("Attachment").ProximityPrompt
+        Timer = Stove:FindFirstChild("Timer").TextLabel
+    else
+        Stove = Settings["Apartment"]:WaitForChild("Interior"):FindFirstChild("Cooking Pot")
+        CookPrompt = Stove:FindFirstChild("Attachment").ProximityPrompt
+        Timer = Stove:FindFirstChild("Timer").TextLabel
+    end
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Marshmallows ] Status: Pouring water."
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+    Settings["Status"] = "[ Marshmallows ] Status: Pouring water."
+    task.wait(.5)
+    Humanoid:UnequipTools()
+    task.wait(.05)
+    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Water"))
+    repeat
+        if Settings["Autofarm Enabled"] ~= true then return end
+        CookPrompt = Stove:FindFirstChild("Attachment").ProximityPrompt
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Water"))
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+        Settings["Status"] = "[ Marshmallows ] Status: Pouring water."
+        task.wait(.25)
+        fireproximityprompt(CookPrompt)
+        task.wait(1.25)
+        Humanoid:UnequipTools()
+        task.wait(.1)
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Water") or PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or Timer.Text == "19"
+    if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have permission to cook in this apartment." then
+        StartMarshmallowFarm()
+        task.spawn(MainAutofarm)
+    return
+    end
+
+    local function BuyPotatoFlour()
+        Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        if (Potato < 1 or Flour < 1) then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            Settings["Status"] = "[ Potato Chips ] Status: Purchasing potato chips ingredients."
+            if Settings["IsHealing"] == true then
+                repeat task.wait() until Settings["IsHealing"] == false
+            end
+            HumanoidRootPart.CFrame = CFrame.new(-766, 4, -197)
+            Settings["Status"] = "[ Potato Chips ] Status: Purchasing potato chips ingredients."
+            task.wait(1)
+            if (Potato < 1) then
+                if Settings["Autofarm Enabled"] ~= true then return end
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                Settings["Status"] = "[ Potato Chips ] Status: Purchasing potato chips ingredients."
+                local Arguments = {
+        	        "Potato";
+                }
+                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer(unpack(Arguments))
+                task.wait(.6)
+            end
+            if (Flour < 1) then
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                Settings["Status"] = "[ Potato Chips ] Status: Purchasing potato chips ingredients."
+                if Settings["Autofarm Enabled"] ~= true then return end
+                local Arguments = {
+        	        "Flour";
+                }
+                ReplicatedStorage:WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer(unpack(Arguments))
+                task.wait(.6)
+            end
+        end
+    end
+    BuyPotatoFlour()
+    repeat
+        Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        task.wait(.1)
+        Settings["Potato Counter"] += 1
+    until (Potato >= 1 and Flour >= 1) or Settings["Potato Counter"] > 190
+    Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+    if (Potato < 1 or Flour < 1) then
+        repeat
+            Settings["Status"] = "[ Potato Chips ] Status: Failed to buy ingredients, trying again."
+            BuyPotatoFlour()
+            repeat
+                Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+                task.wait(.1)
+                Settings["Potato Counter"] += 1
+            until (Potato >= 1 and Flour >= 1) or Settings["Potato Counter"] > 190
+            Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
+        until (Potato >= 1 and Flour >= 1)
+        Settings["Status"] = "[ Potato Chips ] Status: Successfully bought ingredients."
+    else
+        Settings["Status"] = "[ Potato Chips ] Status: Successfully bought ingredients."
+    end
+
+    local Labatory = workspace.Map.Locations["The Laboratory"]
+    local Clipboard = workspace.Map.Locations["The Laboratory"].Prompts.Clipboard
+    local ClipboardPrompt = workspace.Map.Locations["The Laboratory"].Prompts.Clipboard.ProximityPrompt
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Potato Chips ] Status: Claiming j*b."
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(Clipboard.Position)
+    Settings["Status"] = "[ Potato Chips ] Status: Claiming j*b."
+    task.wait(.75)
+    for Index = 1,10 do
+        fireproximityprompt(ClipboardPrompt)
+        task.wait(.05)
+    end
+    task.wait(.05)
+
+    local function PurchaseFakeID()
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Cards ] Status: Purchasing fake ID."
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(215, 4, -332)
+        Settings["Status"] = "[ Cards ] Status: Purchasing fake ID."
+        task.wait(.5)
+        repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("FakeIDSeller")
+        local FakeIDSeller = workspace:WaitForChild("Folders").NPCs:FindFirstChild("FakeIDSeller")
+        local BuyIDPrompt = FakeIDSeller.UpperTorso.Attachment.ProximityPrompt
+        repeat
+            if Settings["Autofarm Enabled"] ~= true then return end
+            fireproximityprompt(BuyIDPrompt)
+            task.wait(.05)
+        until Player:WaitForChild("Backpack"):FindFirstChild("Fake ID")
+        task.wait(4)
+    end
+    PurchaseFakeID()
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Potato Chips ] Status: Cutting potato."
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(-459, 4, -447)
+    Settings["Status"] = "[ Potato Chips ] Status: Cutting potato."
+    task.wait(.5)
+    local PotatoCutter = Labatory["Cutting Boards"]:WaitForChild("Potato Cutter")
+    local PotatoCutterPrompt = PotatoCutter:FindFirstChild("Model").Union.Attachment.ProximityPrompt
+
+    repeat
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Potato"))
+        task.wait(.25)
+        fireproximityprompt(PotatoCutterPrompt)
+        Humanoid:UnequipTools()
+        task.wait(.05)
+        HumanoidRootPart.CFrame = CFrame.new(PotatoCutterPrompt.Parent.Parent.Position)
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Potato") or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have an active task."
+    if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have an active task." then
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(Clipboard.Position)
+        Settings["Status"] = "[ Potato Chips ] Status: Claiming J*b."
+        task.wait(.75)
+        for Index = 1,10 do
+            fireproximityprompt(ClipboardPrompt)
+            task.wait(.05)
+        end
+    end
+    task.wait(2.25)
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Potato Chips ] Status: Bagging potato."
+    local PlasticBag = Labatory:WaitForChild("Prompts")["Plastic Bag"]
+    local PlasticBagPrompt = PlasticBag.Attachment.ProximityPrompt
+
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(PlasticBag.Position)
+    Settings["Status"] = "[ Potato Chips ] Status: Bagging potato."
+    task.wait(.5)
+    for Index = 1, 4 do
+        fireproximityprompt(PlasticBagPrompt)
+        task.wait(.05)
+    end
+    task.wait(3)
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Potato Chips ] Status: Mixing flour and potato."
+    repeat task.wait() until Labatory:WaitForChild("Bowls"):FindFirstChildOfClass("UnionOperation")
+    local Bowl = Labatory:FindFirstChild("Bowls"):FindFirstChildOfClass("UnionOperation")
+    local BowlPrompt = Bowl.ProximityPrompt
+
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(Bowl.Position)
+    Settings["Status"] = "[ Potato Chips ] Status: Mixing flour and potato."
+    task.wait(.5)
+    repeat
+        if Settings["Autofarm Enabled"] ~= true then return end
+        HumanoidRootPart.CFrame = CFrame.new(Bowl.Position)
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Flour"))
+        task.wait(.25)
+        fireproximityprompt(BowlPrompt)
+        Humanoid:UnequipTools()
+        task.wait(.05)
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Flour")
+    task.wait(3.75)
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Potato Chips ] Status: Cooking potato chips."
+    
+    local AvailablePot
+    local PotTimer
+    local PotPrompt
+
+    for Index, Object in next, Labatory:WaitForChild("Pots"):GetChildren() do
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(Object.Position)
+        Settings["Status"] = "[ Potato Chips ] Status: Cooking potato chips."
+        task.wait(.75 + Random:NextNumber(.1, .5))
+        repeat
+            HumanoidRootPart.CFrame = CFrame.new(Object.Position)
+            fireproximityprompt(Object.ProximityPrompt)
+            Settings["Potato Counter"] += 1
+            task.wait()
+        until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or Settings["Potato Counter"] > 100
+        Settings["Potato Counter"] = 0
+        if PlayerGui:WaitForChild("Main").BasicNotification.Text == "This pot is in use." then
+            repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 1
+        else
+            AvailablePot = Object
+            PotTimer = Object.Timer.TextLabel
+            PotPrompt = Object.ProximityPrompt
+            break
+        end
+        task.wait(.05)
+    end
+
+    local function ApplyForCard()
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Cards ] Status: Applying for credit card."
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(-48, 4, -315)
+        task.wait(.5)
+        repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Bank Teller")
+        local BankTeller = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Bank Teller")
+        local BankPrompt = BankTeller.UpperTorso.Attachment.ProximityPrompt
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Fake ID"))
+        task.wait(.1)
+        repeat
+            if Settings["Autofarm Enabled"] ~= true then return end
+            BankPrompt = BankTeller.UpperTorso.Attachment.ProximityPrompt
+            if Settings["IsHealing"] == true then
+                repeat task.wait() until Settings["IsHealing"] == false
+            end
+            HumanoidRootPart.CFrame = CFrame.new(-48, 4, -315)
+            Settings["Status"] = "[ Cards ] Status: Applying for credit card."
+            Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Fake ID"))
+            task.wait(.1)
+            fireproximityprompt(BankPrompt)
+            task.wait(.5)
+            Humanoid:UnequipTools()
+            task.wait(.1)
+            Settings["Potato Counter"] += 1
+        until not Player:WaitForChild("Backpack"):FindFirstChild("Fake ID") or Settings["Potato Counter"] > 2
+        Settings["Potato Counter"] = 67
+    end
+    ApplyForCard()
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Settings["Status"] = "[ Marshmallows ] Status: Adding sugar and gelatin."
+    if Settings["IsHealing"] == true then
+        repeat task.wait() until Settings["IsHealing"] == false
+    end
+    HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+    Settings["Status"] = "[ Marshmallows ] Status: Adding sugar and gelatin."
+    task.wait(.5)
+    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
+    task.wait(.15)
+    for Index = 1,15 do
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
+        HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+        fireproximityprompt(CookPrompt)
+        task.wait(.05)
+    end
+    task.wait(.25)
+
+    if Settings["Autofarm Enabled"] ~= true then return end
+    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Gelatin"))
+    task.wait(.15)
+    repeat
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Gelatin"))
+        HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+        task.wait(.25)
+        fireproximityprompt(CookPrompt)
+        task.wait(.75)
+        Humanoid:UnequipTools()
+        task.wait(.1)
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or Timer.Text == "44"
+
+    Settings["Status"] = "[ Cards ] Status: Waiting for card application response."
+    if Settings["Potato Counter"] == 67 then
+        Settings["Potato Counter"] = 0
+    else
+        repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0
+    end
+    task.wait(.1)
+    if Settings["Autofarm Enabled"] ~= true then return end
+    if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
+        PurchaseFakeID()
+        ApplyForCard()
+        Settings["Cards Counter"] += 1
+        repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0
+    end
+
+    local function DoChipMarsh()
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Marshmallows ] Status: Waiting for marshmallow to cook."
+        repeat task.wait() until Timer.Text == "0"
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Marshmallows ] Status: Bagging cooked marshmallow."
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+        Settings["Status"] = "[ Marshmallows ] Status: Waiting for marshmallow to cook."
+        task.wait(.5)
+        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag"))
+        task.wait(.1)
+        repeat
+            if Settings["Autofarm Enabled"] ~= true then return end
+            CookPrompt = Stove.Attachment.ProximityPrompt
+            if Settings["IsHealing"] == true then
+                repeat task.wait() until Settings["IsHealing"] == false
+            end
+            Settings["Status"] = "[ Marshmallows ] Status: Waiting for marshmallow to cook."
+            HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+            Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag"))
+            task.wait(.1)
+            fireproximityprompt(CookPrompt)
+            task.wait(.25)
+            Humanoid:UnequipTools()
+            task.wait(.05)
+        until not Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag")
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+        task.wait(1)
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Marshmallows ] Status: Selling marshmallows."
+        Humanoid:UnequipTools()
+        for Index, Object in next, Player:WaitForChild("Backpack"):GetChildren() do
+            if tostring(Object):find("Marshmallow") then
+                Humanoid:UnequipTools()
+                task.wait(.05)
+                if Settings["IsHealing"] == true then
+                    repeat task.wait() until Settings["IsHealing"] == false
+                end
+                HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
+                Settings["Status"] = "[ Marshmallows ] Status: Selling marshmallows."
+                Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild(tostring(Object)))
+                task.wait(.15)
+                repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Lamont Bell")
+                local LamontBell = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Lamont Bell")
+                local LamontPrompt = LamontBell.UpperTorso.ProximityPrompt
+                if Settings["Autofarm Enabled"] ~= true then return end
+                fireproximityprompt(LamontPrompt)
+                MarshmallowSold += 1
+                task.wait(.5)
+                Humanoid:UnequipTools()
+            end
+        end
+
+        if Settings["Autofarm Enabled"] ~= true then return end
+        Settings["Status"] = "[ Potato Chips ] Status: Waiting for potato chips to cook."
+        repeat task.wait(.1); Settings["Potato Counter"] += 1 until PotTimer.Text == "0" or PotTimer.TextTransparency == 1 or Settings["Potato Counter"] > 200
+        Settings["Potato Counter"] = 0
+        Settings["Status"] = "[ Potato Chips ] Status: Grabbing cooked potato chips."
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(AvailablePot.Position)
+        Settings["Status"] = "[ Potato Chips ] Status: Waiting for potato chips to cook."
+        repeat
+            fireproximityprompt(PotPrompt)
+            HumanoidRootPart.CFrame = CFrame.new(AvailablePot.Position)
+            Settings["Potato Counter"] += 1
+            task.wait(.1)
+        until Player:WaitForChild("Backpack"):FindFirstChild("Potato Chips") or Settings["Potato Counter"] > 100
+
+        if Settings["Potato Counter"] > 100 then
+            Settings["Potato Counter"] = 0
+            for Index, Object in next, Labatory:WaitForChild("Pots"):GetChildren() do
+                HumanoidRootPart.CFrame = CFrame.new(Object.Position)
+                task.wait(.1)
+                for Index = 1,3 do
+                    fireproximityprompt(Object.ProximityPrompt)
+                end
+                task.wait(.1)
+                Humanoid:UnequipTools()
+                if Player:WaitForChild("Backpack"):FindFirstChild("Potato Chips") then
+                    break
+                end
+            end
+        else
+            if Settings["Autofarm Enabled"] ~= true then return end
+            Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
+            if Settings["IsHealing"] == true then
+                repeat task.wait() until Settings["IsHealing"] == false
+            end
+            HumanoidRootPart.CFrame = CFrame.new(-36, 4, -24)
+            Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
+            task.wait(.5)
+            repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
+            local PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
+            local PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
+            repeat
+                HumanoidRootPart.CFrame = CFrame.new(PoorGuy.UpperTorso.Position)
+                Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
+                fireproximityprompt(PoorGuyPrompt)
+                task.wait(.05)
+            until Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips")
+            task.wait(4)
+
+            if Settings["Autofarm Enabled"] ~= true then return end
+            local AvailableHomeless = FindAvailableHomeless()
+            if #AvailableHomeless == 0 then
+            else
+                repeat
+                    if Settings["Autofarm Enabled"] ~= true then return end
+                    Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
+                    local Homeless = AvailableHomeless[Random:NextInteger(1, #AvailableHomeless)]
+                    local UpperTorso = Homeless:FindFirstChild("UpperTorso")
+                    if Settings["IsHealing"] == true then
+                        repeat task.wait() until Settings["IsHealing"] == false
+                    end
+                    HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                    Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
+                    task.wait(1)
+                    repeat
+                        if Settings["Autofarm Enabled"] ~= true then return end
+                        if Settings["IsHealing"] == true then
+                            repeat task.wait() until Settings["IsHealing"] == false
+                        end
+                        HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                        task.wait()
+                    until workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
+
+                    Homeless = workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
+                    UpperTorso = Homeless:FindFirstChild("UpperTorso")
+                    local UpperTorsoPrompt = UpperTorso.ProximityPrompt
+                    if Settings["Autofarm Enabled"] ~= true then return end
+                    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
+                    task.wait(.1)
+                    if Settings["Autofarm Enabled"] ~= true then return end
+                    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
+                    if Settings["IsHealing"] == true then
+                        repeat task.wait() until Settings["IsHealing"] == false
+                    end
+                    HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                    Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
+                    task.wait(.25)
+                    for Index = 1,5 do
+                        fireproximityprompt(UpperTorsoPrompt)
+                        task.wait(.1)
+                    end
+                    task.wait(.1)
+                    Humanoid:UnequipTools()
+                    task.wait(.05)
+                    AvailableHomeless = FindAvailableHomeless()
+                    Settings["Potato Counter"] += 1
+                until #AvailableHomeless == 0 or not Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips") or Settings["Potato Counter"] > 6
+                Settings["Potato Counter"] = 0
+                PotatoChipsSold += 1
+                task.wait(2)
+            end
+        end
+    end
+
+    if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
+        DoChipMarsh()
+    else
+        Settings["Status"] = "[ Cards ] Status: Card application successful, waiting for a response from the system."
+        local function DoCards()
+            if Settings["Autofarm Enabled"] ~= true then return end
+            Settings["Status"] = "[ Cards ] Status: Attempting to claim card."
+            local Card = workspace:WaitForChild("CardPickup")
+            local CardPrompt = Card.Attachment.ProximityPrompt
+            if Settings["IsHealing"] == true then
+                repeat task.wait() until Settings["IsHealing"] == false
+            end
+            HumanoidRootPart.CFrame = CFrame.new(Card.Position)
+            Settings["Status"] = "[ Cards ] Status: Attempting to claim card."
+            task.wait(.5)
+            repeat
+                if Settings["Autofarm Enabled"] ~= true then return end
+                HumanoidRootPart.CFrame = CFrame.new(Card.Position)
+                CardPrompt = Card.Attachment.ProximityPrompt
+                fireproximityprompt(CardPrompt)
+                task.wait(.05)
+            until Player:WaitForChild("Backpack"):FindFirstChild("Card") or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card."
+            if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card." then
+            else
+                repeat
+                    local ATM = FindAvailableATMs()
+                    if ATM ~= nil then
+                        Settings["Status"] = "[ Cards ] Status: Attempting to use blank card."
+                        local ATMPrompt = ATM.Attachment.ProximityPrompt
+                        if Settings["Autofarm Enabled"] ~= true then return end
+                        if Settings["IsHealing"] == true then
+                            repeat task.wait() until Settings["IsHealing"] == false
+                        end
+                        HumanoidRootPart.CFrame = CFrame.new(ATM.Position)
+                        Settings["Status"] = "[ Cards ] Status: Attempting to use blank card."
+                        task.wait(.75)
+                        repeat
+                            if Settings["Autofarm Enabled"] ~= true then return end
+                            fireproximityprompt(ATMPrompt)
+                            if Settings["IsHealing"] == true then
+                                repeat task.wait() until Settings["IsHealing"] == false
+                            end
+                            HumanoidRootPart.CFrame = CFrame.new(ATM.Position)
+                            Settings["Status"] = "[ Cards ] Status: Attempting to use blank card."
+                            task.wait(.1)
+                        until PlayerGui:FindFirstChild("ATM")
+                        task.wait(.1)
+                        Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Card"))
+                        task.wait(.25)
+                        if Settings["Autofarm Enabled"] ~= true then return end
+                        replicatesignal(game:GetService("Players").LocalPlayer.PlayerGui.ATM.Frame.Swipe.MouseButton1Click, Player)
+                    else
+                        Settings["Status"] = "[ Cards ] Status: No available ATM, skipping cards."
+                    end
+                    task.wait(.1)
+                    Humanoid:UnequipTools()
+                    task.wait(.1)
+                until not Player:WaitForChild("Backpack"):FindFirstChild("Card") or Settings["Status"] == "[ Cards ] Status: No available ATM, skipping cards."
+                if Settings["Status"] == "[ Cards ] Status: No available ATM, skipping cards." then
+                    CardsDone += 1
+                else
+                    CardsDone += 1
+                end
+            end
+        end
+        if Settings["Cards Counter"] == 1 then
+            DoChipMarsh()
+            DoCards()
+            Settings["Cards Counter"] = 0
+        else
+            task.wait(30)
+            DoCards()
+            DoChipMarsh()
+        end
+    end
+    Cycles += 1
+    MainAutofarm()
+end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Auto Farm Hub",
+   Icon = 0, 
+   LoadingTitle = "Auto Farm Hub",
+   LoadingSubtitle = "by T and Logan",
+   ShowText = "South Bronx", 
+   Theme = "Default", 
+
+   ToggleUIKeybind = "Z",
+
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil,
+      FileName = "SBAutoFarmHub"
+   },
+
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+
+   KeySystem = false,
+   KeySettings = {
+      Title = "Untitled",
+      Subtitle = "Key System",
+      Note = "No method of obtaining the key is provided",
+      FileName = "Key",
+      SaveKey = true, 
+      GrabKeyFromSite = false, 
+      Key = {"Hello"}
+   }
+})
+
+local Tab = Window:CreateTab("Autofarm", 4483362458)
+local Section = Tab:CreateSection("Autofarm")
+
+local Toggle = Tab:CreateToggle({
+   Name = "Autofarming",
+   CurrentValue = true,
+   Flag = "Toggle1",
+   Callback = function(Value)
+    Settings["Autofarm Enabled"] = Value
+   end,
+})
+
+local Toggle2 = Tab:CreateToggle({
+   Name = "Auto-crouch",
+   CurrentValue = true,
+   Flag = "Toggle2",
+   Callback = function(Value)
+    Settings['Autocrouch Enabled'] = Value
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Start Autofarm",
+   Callback = function()
+    MainAutofarm()
+   end,
+})
+
+local Paragraph = Tab:CreateParagraph({Title = "Status Information", Content = "[ Startup ] Status: none"})
+local Paragraph2 = Tab:CreateParagraph({Title = "Runtime Information", Content = "Runtime: nil  |  Cycle: nil  |  Money Made: nil"})
+local Paragraph3 = Tab:CreateParagraph({Title = "Sold Information", Content = "Potato Chips Fed: nil | Marshmallows Sold: nil | Credit Cards Used: nil"})
+local Paragraph4 = Tab:CreateParagraph({Title = "Hourly Rate Information", Content = "Hourly Rate: nil"})
+
+task.spawn(function()
+    while task.wait() do
+        local Runtime = os.clock() - Now
+        local Information = "Runtime: " .. tostring(math.floor(Runtime)) .. " seconds  |  Cycle: " .. tostring(Cycles) .. "  |  Money Made: " .. tostring(GetCommaValue(MoneyDifference)) .. " Cash"
+        local SellInfo = "Potato Chips Fed: " .. PotatoChipsSold .. " | Marshmallows Sold: " .. MarshmallowSold .. " | Credit Cards Used: " .. CardsDone
+        local HourlyRate = "Hourly Rate: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Runtime) * MoneyDifference))) .. " Cash"
+        Paragraph:Set({Title = "Status Information", Content = Settings["Status"]})
+        Paragraph2:Set({Title = "Runtime Information", Content = Information})
+        Paragraph3:Set({Title = "Sold Information", Content = SellInfo})
+        Paragraph4:Set({Title = "Hourly Rate Information", Content = HourlyRate})
+    end
+end)
+
+task.spawn(function()
+    Player.CharacterAdded:Connect(function()
+        Character = Player.Character
+        Humanoid = Character:WaitForChild("Humanoid")
+        HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+    end)
+end)
+
+PurchaseSkiMask()
+Settings['Autocrouch Enabled'] = true
+if Settings["IsHealing"] == true then
+    repeat task.wait() until Settings["IsHealing"] == false
+end
+local StartMarshmallowfarm = StartMarshmallowFarm()
+if StartMarshmallowfarm == true then
+    Settings["Status"] = "[ Startup ] Status: Apartment found."
+else
+    Settings["Status"] = "[ Startup ] Status: Apartment not found, waiting."
+    repeat 
+        StartMarshmallowfarm = StartMarshmallowFarm() 
+        task.wait(.25) 
+    until StartMarshmallowfarm == true
+    Settings["Status"] = "[ Startup ] Status: Apartment found."
+end
+]])
+writefile(AutofarmSettings.lua, longstring)
