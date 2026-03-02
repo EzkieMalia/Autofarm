@@ -120,7 +120,7 @@ task.spawn(function()
     Humanoid.Died:Connect(function()
         if Settings["Auto Rejoin"] == true then
             writefile("AutorejoinerTXT.txt", "true")
-            loadstring(game:HttpGet(url))
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/Autofarm.lua"))()
         end
     end)
 end)
@@ -324,7 +324,7 @@ local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 
 local function MainAutofarm()
     Settings["Auto Rejoin"] = true
-    writefile(AutorejoinerTXT.txt, "true")
+    writefile("AutorejoinerTXT.txt", "true")
     repeat task.wait() until Humanoid.Health > 20
     if Settings["Apartment"] == nil then return end
     if Settings["Autofarm Enabled"] ~= true then return end
