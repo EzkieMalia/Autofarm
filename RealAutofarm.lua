@@ -11,7 +11,7 @@ local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPar
 local Random = Random.new()
 
 writefile("AutorejoinerTXT.txt", "false")
-local string = "https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/Autofarm.lua"
+local string = "https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/RealAutofarm.lua"
 writefile("auto_rejoiner.txt", string)
 
 if game.PlaceId ~= 15124180230 then
