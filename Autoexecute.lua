@@ -1,3 +1,4 @@
+print("Wrote file")
 repeat task.wait() until game:IsLoaded()
 local longstring = ([[
 local VIP = cloneref(game:GetService("VirtualInputManager"))
@@ -1073,4 +1074,5 @@ else
     Settings["Status"] = "[ Startup ] Status: Apartment found."
 end
 ]])
-writefile(AutofarmSettings.lua, longstring)
+writefile(AutofarmSettings.txt, longstring)
+print("Confirmed")
