@@ -1,3 +1,4 @@
+task.spawn(function()
 repeat task.wait() until game:IsLoaded()
 local VIP = cloneref(game:GetService("VirtualInputManager"))
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1112,3 +1113,4 @@ if readfile("AutorejoinerTXT.txt") == "true" then
     return
 end
 writefile("AutorejoinerTXT.txt", "false")
+end)
