@@ -1153,23 +1153,6 @@ if readfile("AutorejoinerTXT.txt") == "true" then
         writefile("AutorejoinerTXT.txt", "false")
         return
     end
-    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI")
-    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI"):FindFirstChild("SurfaceGui")
-    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame")
-    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
-    repeat
-        if PlayerGui:FindFirstChild("IntroUI") then
-            replicatesignal(PlayerGui:FindFirstChild("IntroUI"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play").MouseEnter, 450, 620)
-        end
-        mousemoveabs(450 , 620)
-        task.wait(.1)
-        if PlayerGui:FindFirstChild("IntroUI") then
-            replicatesignal(PlayerGui:FindFirstChild("IntroUI"):FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play").MouseButton1Click, Player)
-        end
-        VIP:SendMouseButtonEvent(450, 620, 1, true, nil, 1)
-        VIP:SendMouseButtonEvent(450, 620, 1, true, nil, 1)
-        task.wait(.25)
-    until not PlayerGui:FindFirstChild("IntroUI")
     MainAutofarm()
     writefile("AutorejoinerTXT.txt", "false")
     return
