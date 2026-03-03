@@ -25,6 +25,11 @@ local MoneyDifference = 0
 local CardsDone = 0
 local Now = os.clock()
 
+local Runtime
+local Information
+local SellInfo
+local HourlyRate = 0
+
 local Settings = {
     ["Status"] = "[ Startup ] Status: none";
     ["Autofarm Enabled"] = true;
@@ -49,6 +54,10 @@ task.spawn(function()
             Player:Kick("Auto Farm Protection | Reached Max Money.")
         return end
         if Settings["IsHealing"] ~= true then
+            repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
+            repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
+            repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
+            if tonumber(HourlyRate) > 1000000 then Result = Settings["Starting Cash"]; end
             Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
             MoneyDifference = tonumber(Result) - Settings["Starting Cash"]
         end
@@ -1055,10 +1064,10 @@ local Paragraph4 = Tab:CreateParagraph({Title = "Hourly Rate Information", Conte
 
 task.spawn(function()
     while task.wait() do
-        local Runtime = os.clock() - Now
-        local Information = "Runtime: " .. tostring(math.floor(Runtime)) .. " seconds  |  Cycle: " .. tostring(Cycles) .. "  |  Money Made: " .. tostring(GetCommaValue(MoneyDifference)) .. " Cash"
-        local SellInfo = "Potato Chips Fed: " .. PotatoChipsSold .. " | Marshmallows Sold: " .. MarshmallowSold .. " | Credit Cards Used: " .. CardsDone
-        local HourlyRate = "Hourly Rate: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Runtime) * MoneyDifference))) .. " Cash"
+        Runtime = os.clock() - Now
+        Information = "Runtime: " .. tostring(math.floor(Runtime)) .. " seconds  |  Cycle: " .. tostring(Cycles) .. "  |  Money Made: " .. tostring(GetCommaValue(MoneyDifference)) .. " Cash"
+        SellInfo = "Potato Chips Fed: " .. PotatoChipsSold .. " | Marshmallows Sold: " .. MarshmallowSold .. " | Credit Cards Used: " .. CardsDone
+        HourlyRate = "Hourly Rate: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Runtime) * MoneyDifference))) .. " Cash"
         Paragraph:Set({Title = "Status Information", Content = Settings["Status"]})
         Paragraph2:Set({Title = "Runtime Information", Content = Information})
         Paragraph3:Set({Title = "Sold Information", Content = SellInfo})
