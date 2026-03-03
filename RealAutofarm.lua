@@ -923,7 +923,7 @@ local function MainAutofarm()
                     end
                     HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
                     Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                    for Index = 1,3 do
+                    for Index = 1,5 do
                         if Settings["Autofarm Enabled"] ~= true then return end
                         if Settings["IsHealing"] == true then
                             repeat task.wait() until Settings["IsHealing"] == false
