@@ -766,6 +766,7 @@ local function MainAutofarm()
     Settings["Status"] = "[ Cards ] Status: Waiting for card application response."
     if Settings["Potato Counter"] == 67 then
         Settings["Potato Counter"] = 0
+        repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0
     else
         repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0
     end
@@ -982,6 +983,7 @@ local function MainAutofarm()
             until Player:WaitForChild("Backpack"):FindFirstChild("Card") or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card."
             if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card." and not Player:WaitForChild("Backpack"):FindFirstChild("Card") then
             else
+                task.wait(2)
                 repeat
                     local ATM = FindAvailableATMs()
                     if ATM ~= nil then
