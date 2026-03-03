@@ -42,6 +42,7 @@ local Settings = {
     ["Starting Cash"] = 0;
     ['Autocrouch Enabled'] = false;
     ["Auto Rejoin"] = false;
+    ["Enough Cash"] = false;
 }
 
 task.spawn(function()
@@ -58,8 +59,13 @@ task.spawn(function()
             repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
-            if HourlyRate2 ~= nil or HourlyRate2 == "0" or HourlyRate2 == "100" then
+            if HourlyRate2 ~= nil or HourlyRate2 ~= "100" then
                 if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
+            end
+            if tonumber(Result) > 2500 then
+                Settings["Enough Cash"] = true
+            else
+                Settings["Enough Cash"] = false
             end
             Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
             MoneyDifference = tonumber(Result) - Settings["Starting Cash"]
@@ -228,7 +234,8 @@ local function FindAvailableHomeless()
 end
 
 local function StartMarshmallowFarm()
-    repeat task.wait() until Humanoid.Health > 20
+    repeat task.wait() until Settings["Enough Cash"] == true
+    repeat task.wait() until Settings["IsHealing"] == false
     local Apartment, Owned = FindAvailableApartments()
     if #Apartment ~= 0 then
         if Settings["Autofarm Enabled"] ~= true then return end
@@ -320,6 +327,7 @@ local function ScavengeInventory()
 end
 
 local function PurchaseSkiMask()
+    repeat task.wait() until Settings["Enough Cash"] == true
     if Settings["IsHealing"] == true then
         repeat task.wait() until Settings["IsHealing"] == false
     end
@@ -352,7 +360,8 @@ local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 local function MainAutofarm()
     Settings["Auto Rejoin"] = true
     writefile("AutorejoinerTXT.txt", "true")
-    repeat task.wait() until Humanoid.Health > 20
+    repeat task.wait() until Settings["Enough Cash"] == true
+    repeat task.wait() until Settings["IsHealing"] == false
     if Settings["Apartment"] == nil then return end
     if Settings["Autofarm Enabled"] ~= true then return end
     if Settings["IsHealing"] == true then
@@ -1093,7 +1102,7 @@ task.spawn(function()
         Information = "Runtime: " .. tostring(math.floor(Runtime)) .. " seconds  |  Cycle: " .. tostring(Cycles) .. "  |  Money Made: " .. tostring(GetCommaValue(MoneyDifference)) .. " Cash"
         SellInfo = "Potato Chips Fed: " .. PotatoChipsSold .. " | Marshmallows Sold: " .. MarshmallowSold .. " | Credit Cards Used: " .. CardsDone
         HourlyRate = "Hourly Rate: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Runtime) * MoneyDifference))) .. " Cash"
-        HourlyRate2 = tostring(GetCommaValue(math.floor(3600/math.floor(Runtime) * MoneyDifference)))
+        HourlyRate2 = tostring(math.floor(3600/math.floor(Runtime) * MoneyDifference))
         Paragraph:Set({Title = "Status Information", Content = Settings["Status"]})
         Paragraph2:Set({Title = "Runtime Information", Content = Information})
         Paragraph3:Set({Title = "Sold Information", Content = SellInfo})
