@@ -58,7 +58,9 @@ task.spawn(function()
             repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
-            if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
+            if HourlyRate2 ~= nil and type(HourlyRate2) == "string" or type(HourlyRate2) == "number" then
+                if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
+            end
             Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
             MoneyDifference = tonumber(Result) - Settings["Starting Cash"]
         end
@@ -76,7 +78,6 @@ task.spawn(function()
             Settings["Status"] = "[ Startup ] Status: Autofarm is stopped."
             task.wait()
         else
-            Settings["Status"] = "[ Startup ] Status: Waiting for a reponse from the system."
             task.wait()
         end
     end
@@ -197,13 +198,13 @@ end
 local function FindAvailableHomeless()
     Settings["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position)
     HumanoidRootPart.CFrame = CFrame.new(899, 4, -284)
-    task.wait(.15)
+    task.wait(.1)
     HumanoidRootPart.CFrame = CFrame.new(518, 4, -295)
-    task.wait(.15)
+    task.wait(.1)
     HumanoidRootPart.CFrame = CFrame.new(135, 8, -322)
-    task.wait(.15)
+    task.wait(.1)
     HumanoidRootPart.CFrame = CFrame.new(1102, 4, 529)
-    task.wait(.15)
+    task.wait(.1)
     HumanoidRootPart.CFrame = Settings["Old HRP Position"]
     task.wait(.25)
     local Homeless = ReplicatedStorage:WaitForChild("Workspace").Homeless
@@ -243,10 +244,10 @@ local function StartMarshmallowFarm()
             local Board = apt:FindFirstChild("Board")
             local Prompt = Board.backboard.ProximityPrompt
             HumanoidRootPart.CFrame = CFrame.new(Board.backboard.Position)
-            task.wait(.75)
+            task.wait(.5)
             repeat
                 fireproximityprompt(Prompt)
-                task.wait(.75)
+                task.wait(.25)
             until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or Board.name.SurfaceGui.TextLabel.Text == tostring(Player)
             if PlayerGui:WaitForChild("Main").BasicNotification.Text == "This apartment is already occupied!" then
                 task.spawn(StartMarshmallowFarm)
@@ -272,15 +273,15 @@ local function StartMarshmallowFarm()
         if Lock.Part.Rotation.X ~= 90 then
             if Settings["Autofarm Enabled"] ~= true then return end
             HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
-            task.wait(.9)
+            task.wait(.25)
             repeat
                 HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
                 fireproximityprompt(Lock.Part.ProximityPrompt)
-                task.wait(.5)
+                task.wait(.25)
                 fireproximityprompt(KnobPrompt)
             until Lock.Part.Rotation.X == 90
         end
-        task.wait(.5)
+        task.wait(.25)
         HumanoidRootPart.CFrame = Settings["Old HRP Position"]
         return true
     else
@@ -322,12 +323,12 @@ local function PurchaseSkiMask()
     end
     Settings["Status"] = "[ Startup ] Status: Purchasing Ski-Mask."
     Humanoid:UnequipTools()
-    task.wait(.1)
+    task.wait(.05)
     if not Player:WaitForChild("Backpack"):FindFirstChild("SkiMask") then
         HumanoidRootPart.CFrame = CFrame.new(-363, 4, -321)
-        task.wait(1)
+        task.wait(.5)
         game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("StorePurchase"):FireServer("SkiMask")
-        repeat task.wait() until Player:WaitForChild("Backpack"):FindFirstChild("SkiMask")
+        repeat task.wait(); Humanoid:UnequipTools() until Player:WaitForChild("Backpack"):FindFirstChild("SkiMask")
     end
     if not Character:FindFirstChild("SkiMask") :: Accessory then
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("SkiMask"))
@@ -337,7 +338,7 @@ local function PurchaseSkiMask()
             Character:WaitForChild("SkiMask")
         }
         game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("RPC"):FireServer(unpack(Args))
-        task.wait(.25)
+        task.wait(.05)
         Humanoid:UnequipTools()
     end
     HumanoidRootPart.CFrame = Settings["Old HRP Position"]
