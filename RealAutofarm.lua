@@ -70,38 +70,45 @@ task.spawn(function()
         VirtualUser:CaptureController()
         VirtualUser:ClickButton2(Vector2.new())
     end)
-    while Settings["Autofarm Enabled"] ~= true do
-        task.wait()
-        Settings["Status"] = "[ Startup ] Status: Autofarm is stopped."
+    while task.wait() do
+        if Settings["Autofarm Enabled"] ~= true then
+            Settings["Status"] = "[ Startup ] Status: Autofarm is stopped."
+            task.wait()
+        else
+            Settings["Status"] = "[ Startup ] Status: Waiting for a reponse from the system."
+            task.wait()
+        end
     end
 end)
 
 task.spawn(function()
-    while Settings["Autofarm Enabled"] == true do
-        Settings["Ping"] = Player:GetNetworkPing()
-        VIP:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
-        task.wait()
-        VIP:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
-        task.wait()
-        if Settings['Autocrouch Enabled'] == true then
-            VIP:SendKeyEvent(true, Enum.KeyCode.C, false, nil)
+    while task.wait() do
+        if Settings["Autofarm Enabled"] ==  true then
+            Settings["Ping"] = Player:GetNetworkPing()
+            VIP:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
             task.wait()
-            VIP:SendKeyEvent(false, Enum.KeyCode.C, false, nil)
-        end
-        if Humanoid.Health <= 80 then
-            Settings["IsHealing"] = true
-            Settings["Status"] = "[ Startup ] Status: Healing."
-            HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
-        else
-            Settings["IsHealing"] = false
-            if Settings["Status"] == "[ Startup ] Status: Healing." then
-                Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
+            VIP:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
+            task.wait()
+            if Settings['Autocrouch Enabled'] == true then
+                VIP:SendKeyEvent(true, Enum.KeyCode.C, false, nil)
+                task.wait()
+                VIP:SendKeyEvent(false, Enum.KeyCode.C, false, nil)
             end
+            if Humanoid.Health <= 80 then
+                Settings["IsHealing"] = true
+                Settings["Status"] = "[ Startup ] Status: Healing."
+                HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
+            else
+                Settings["IsHealing"] = false
+                if Settings["Status"] == "[ Startup ] Status: Healing." then
+                    Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
+                end
+            end
+            if HumanoidRootPart.Position.Y <= -10 then
+                HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
+            end
+            task.wait()
         end
-        if HumanoidRootPart.Position.Y <= -10 then
-            HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
-        end
-        task.wait()
     end
 end)
 
@@ -201,9 +208,14 @@ local function FindAvailableHomeless()
     local Homeless = ReplicatedStorage:WaitForChild("Workspace").Homeless
     local AvailableHomeless = {}
     for Index, Object in next, Homeless:GetChildren() do
-        if Object:IsA("Model") then
+        if Object:IsA("Model") and tostring(Object) ~= "Six" then
             local UpperTorso = Object:FindFirstChild("UpperTorso")
             if UpperTorso.Position.Y < 2.35 and math.floor(UpperTorso.Position.Y) ~= 4 or math.floor(UpperTorso.Position.Y) ~= 3 then
+                table.insert(AvailableHomeless, Object)
+            end
+        else
+            local UpperTorso = Object:FindFirstChild("UpperTorso")
+            if UpperTorso.Position.Y > -9.6 and math.floor(UpperTorso.Position.Y) ~= -9 or math.floor(UpperTorso.Position.Y) ~= 3 then
                 table.insert(AvailableHomeless, Object)
             end
         end
@@ -536,7 +548,6 @@ local function MainAutofarm()
         fireproximityprompt(ClipboardPrompt)
         task.wait(.05)
     end
-    task.wait(.05)
 
     local function PurchaseFakeID()
         if Settings["Autofarm Enabled"] ~= true then return end
@@ -574,10 +585,14 @@ local function MainAutofarm()
         if Settings["Autofarm Enabled"] ~= true then return end
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Potato"))
         task.wait(.25)
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] == false
+        end
+        HumanoidRootPart.CFrame = CFrame.new(PotatoCutterPrompt.Parent.Parent.Position)
+        Settings["Status"] = "[ Potato Chips ] Status: Cutting potato."
         fireproximityprompt(PotatoCutterPrompt)
         Humanoid:UnequipTools()
         task.wait(.05)
-        HumanoidRootPart.CFrame = CFrame.new(PotatoCutterPrompt.Parent.Parent.Position)
     until not Player:WaitForChild("Backpack"):FindFirstChild("Potato") or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have an active task."
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have an active task." then
         if Settings["IsHealing"] == true then
@@ -662,7 +677,6 @@ local function MainAutofarm()
             PotPrompt = Object.ProximityPrompt
             break
         end
-        task.wait(.05)
     end
 
     local function ApplyForCard()
@@ -708,7 +722,7 @@ local function MainAutofarm()
     task.wait(.5)
     Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
     task.wait(.15)
-    for Index = 1,15 do
+    for Index = 1,10 do
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
         HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
         fireproximityprompt(CookPrompt)
@@ -724,7 +738,7 @@ local function MainAutofarm()
         HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
         task.wait(.25)
         fireproximityprompt(CookPrompt)
-        task.wait(.75)
+        task.wait(1)
         Humanoid:UnequipTools()
         task.wait(.1)
     until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or Timer.Text == "44"
@@ -771,7 +785,7 @@ local function MainAutofarm()
             Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag"))
             task.wait(.1)
             fireproximityprompt(CookPrompt)
-            task.wait(.25)
+            task.wait(.15)
             Humanoid:UnequipTools()
             task.wait(.05)
         until not Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag")
@@ -779,7 +793,7 @@ local function MainAutofarm()
             repeat task.wait() until Settings["IsHealing"] == false
         end
         HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
-        task.wait(1)
+        task.wait(.75)
         if Settings["Autofarm Enabled"] ~= true then return end
         Settings["Status"] = "[ Marshmallows ] Status: Selling marshmallows."
         Humanoid:UnequipTools()
@@ -793,14 +807,14 @@ local function MainAutofarm()
                 HumanoidRootPart.CFrame = CFrame.new(510, 4, 595)
                 Settings["Status"] = "[ Marshmallows ] Status: Selling marshmallows."
                 Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild(tostring(Object)))
-                task.wait(.15)
+                task.wait(.1)
                 repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Lamont Bell")
                 local LamontBell = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Lamont Bell")
                 local LamontPrompt = LamontBell.UpperTorso.ProximityPrompt
                 if Settings["Autofarm Enabled"] ~= true then return end
                 fireproximityprompt(LamontPrompt)
                 MarshmallowSold += 1
-                task.wait(.5)
+                task.wait(.25)
                 Humanoid:UnequipTools()
             end
         end
@@ -853,7 +867,9 @@ local function MainAutofarm()
                 Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
                 fireproximityprompt(PoorGuyPrompt)
                 task.wait(.05)
-            until Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips")
+                Settings["Potato Counter"] += 1
+            until Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips") or Settings["Potato Counter"] > 160
+            Settings["Potato Counter"] = 0
             task.wait(4)
 
             if Settings["Autofarm Enabled"] ~= true then return end
@@ -870,7 +886,7 @@ local function MainAutofarm()
                     end
                     HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
                     Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                    task.wait(1)
+                    task.wait(.25)
                     repeat
                         if Settings["Autofarm Enabled"] ~= true then return end
                         if Settings["IsHealing"] == true then
@@ -893,8 +909,13 @@ local function MainAutofarm()
                     end
                     HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
                     Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                    task.wait(.25)
-                    for Index = 1,5 do
+                    for Index = 1,3 do
+                        if Settings["Autofarm Enabled"] ~= true then return end
+                        if Settings["IsHealing"] == true then
+                            repeat task.wait() until Settings["IsHealing"] == false
+                        end
+                        HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                        Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
                         fireproximityprompt(UpperTorsoPrompt)
                         task.wait(.1)
                     end
@@ -906,7 +927,7 @@ local function MainAutofarm()
                 until #AvailableHomeless == 0 or not Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips") or Settings["Potato Counter"] > 10
                 Settings["Potato Counter"] = 0
                 PotatoChipsSold += 1
-                task.wait(2)
+                task.wait(.5)
             end
         end
     end
@@ -933,7 +954,7 @@ local function MainAutofarm()
                 fireproximityprompt(CardPrompt)
                 task.wait(.05)
             until Player:WaitForChild("Backpack"):FindFirstChild("Card") or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card."
-            if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card." then
+            if PlayerGui:WaitForChild("Main").BasicNotification.Text == "You are not on the wait list for a card." and not Player:WaitForChild("Backpack"):FindFirstChild("Card") then
             else
                 repeat
                     local ATM = FindAvailableATMs()
