@@ -107,7 +107,7 @@ task.spawn(function()
                 end
             end
             if HumanoidRootPart.Position.Y <= -10 then
-                HumanoidRootPart.CFrame = CFrame.new(-809, 4, 593)
+                HumanoidRootPart.CFrame = CFrame.new(-769, 6, 654)
             end
             task.wait()
         end
@@ -197,6 +197,8 @@ end
 
 local function FindAvailableHomeless()
     Settings["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position)
+    HumanoidRootPart.CFrame = CFrame.new(-769, 6, 654)
+    task.wait(.15)
     HumanoidRootPart.CFrame = CFrame.new(899, 4, -284)
     task.wait(.1)
     HumanoidRootPart.CFrame = CFrame.new(518, 4, -295)
@@ -215,7 +217,7 @@ local function FindAvailableHomeless()
             if UpperTorso.Position.Y < 2.35 and math.floor(UpperTorso.Position.Y) ~= 4 or math.floor(UpperTorso.Position.Y) ~= 3 then
                 table.insert(AvailableHomeless, Object)
             end
-        else
+        elseif tostring(Object) == "Six" and Object:IsA("Model") then
             local UpperTorso = Object:FindFirstChild("UpperTorso")
             if UpperTorso.Position.Y > -9.6 and math.floor(UpperTorso.Position.Y) ~= -9 or math.floor(UpperTorso.Position.Y) ~= 3 then
                 table.insert(AvailableHomeless, Object)
