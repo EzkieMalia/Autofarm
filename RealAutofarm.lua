@@ -368,11 +368,6 @@ end
 local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 
 local function MainAutofarm()
-    local Animation = Instance.new('Animation')
-    Animation.AnimationId = "rbxassetid://126995783634131"
-    local Track = Humanoid:FindFirstChild('Animator'):LoadAnimation(Animation)
-    Track.Priority = Enum.AnimationPriority.Action4
-    Track:Play()
     Settings["Auto Rejoin"] = true
     writefile("AutorejoinerTXT.txt", "false")
     repeat task.wait() until Settings["Enough Cash"] == true
