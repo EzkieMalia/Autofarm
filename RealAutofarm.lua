@@ -34,7 +34,7 @@ local HourlyRate
 local HourlyRate2 = "100"
 
 local Settings = {
-    ["Status"] = "[ Startup ] Status: none";
+    ["Status"] = "[ Startup ] Status: Waiting for a response from the system.";
     ["Autofarm Enabled"] = true;
     ["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position);
     ["IsHealing"] = false;
@@ -68,6 +68,7 @@ task.spawn(function()
             elseif readfile("AutorejoinerTXT.txt") == true then
                 Settings["Enough Cash"] = true
             else
+                Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
                 Settings["Enough Cash"] = false
             end
             Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
@@ -228,7 +229,7 @@ local function FindAvailableHomeless()
             end
         elseif tostring(Object) == "Six" and Object:IsA("Model") then
             local UpperTorso = Object:FindFirstChild("UpperTorso")
-            if UpperTorso.Position.Y > -9.6 and math.floor(UpperTorso.Position.Y) ~= -9 or math.floor(UpperTorso.Position.Y) ~= 3 then
+            if UpperTorso.Position.Y < -9 then
                 table.insert(AvailableHomeless, Object)
             end
         end
