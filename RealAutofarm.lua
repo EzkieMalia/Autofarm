@@ -20,7 +20,7 @@ if game.PlaceId ~= 15124180230 then
     Player:Kick("Auto Farm Protection | This isn't supported on regular servers.")
 return end
 
-local Cycles = 0
+local Cycles = 1
 local MarshmallowSold = 0
 local PotatoChipsSold = 0
 local MoneyDifference = 0
@@ -62,7 +62,7 @@ task.spawn(function()
             repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabe
-            if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
+            if tonumber(HourlyRate2) > 1000000 then Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", ""); Settings["Starting Cash"] = tonumber(Result); Result = Settings["Starting Cash"]; end
             if tonumber(Result) > 2500 then
                 Settings["Enough Cash"] = true
             elseif readfile("AutorejoinerTXT.txt") == true then
@@ -918,45 +918,47 @@ local function MainAutofarm()
                             if Settings["Autofarm Enabled"] ~= true then return end
                             Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
                             local Homeless = AvailableHomeless[Random:NextInteger(1, #AvailableHomeless)]
-                            repeat task.wait() until Homeless:FindFirstChild("UpperTorso")
-                            local UpperTorso = Homeless:FindFirstChild("UpperTorso")
-                            if Settings["IsHealing"] == true then
-                                repeat task.wait() until Settings["IsHealing"] == false
-                            end
-                            HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
-                            Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                            task.wait(.25)
-                            repeat
-                                if Settings["Autofarm Enabled"] ~= true then return end
-                                if Settings["IsHealing"] == true then
-                                    repeat task.wait() until Settings["IsHealing"] == false
-                                end
-                                HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
-                                task.wait()
-                            until workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
-
-                            Homeless = workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
-                            UpperTorso = Homeless:FindFirstChild("UpperTorso")
-                            local UpperTorsoPrompt = UpperTorso.ProximityPrompt
-                            if Settings["Autofarm Enabled"] ~= true then return end
-                            Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
-                            task.wait(.1)
-                            if Settings["Autofarm Enabled"] ~= true then return end
-                            Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
-                            if Settings["IsHealing"] == true then
-                                repeat task.wait() until Settings["IsHealing"] == false
-                            end
-                            HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
-                            Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                            for Index = 1,5 do
-                                if Settings["Autofarm Enabled"] ~= true then return end
+                            if Homeless ~= nil then
+                                repeat task.wait() until Homeless:FindFirstChild("UpperTorso")
+                                local UpperTorso = Homeless:WaitForChild("UpperTorso")
                                 if Settings["IsHealing"] == true then
                                     repeat task.wait() until Settings["IsHealing"] == false
                                 end
                                 HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
                                 Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                                fireproximityprompt(UpperTorsoPrompt)
+                                task.wait(.25)
+                                repeat
+                                    if Settings["Autofarm Enabled"] ~= true then return end
+                                    if Settings["IsHealing"] == true then
+                                        repeat task.wait() until Settings["IsHealing"] == false
+                                    end
+                                    HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                                    task.wait()
+                                until workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
+
+                                Homeless = workspace:WaitForChild("Folders").HomelessPeople:FindFirstChild(tostring(Homeless))
+                                UpperTorso = Homeless:FindFirstChild("UpperTorso")
+                                local UpperTorsoPrompt = UpperTorso.ProximityPrompt
+                                if Settings["Autofarm Enabled"] ~= true then return end
+                                Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
                                 task.wait(.1)
+                                if Settings["Autofarm Enabled"] ~= true then return end
+                                Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips"))
+                                if Settings["IsHealing"] == true then
+                                    repeat task.wait() until Settings["IsHealing"] == false
+                                end
+                                HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                                Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
+                                for Index = 1,5 do
+                                    if Settings["Autofarm Enabled"] ~= true then return end
+                                    if Settings["IsHealing"] == true then
+                                        repeat task.wait() until Settings["IsHealing"] == false
+                                    end
+                                    HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
+                                    Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
+                                    fireproximityprompt(UpperTorsoPrompt)
+                                    task.wait(.1)
+                                end
                             end
                             task.wait(.1)
                             Humanoid:UnequipTools()
