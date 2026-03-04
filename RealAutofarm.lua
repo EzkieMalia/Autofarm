@@ -56,7 +56,7 @@ task.spawn(function()
     Settings["Starting Cash"] = tonumber(Result)
     while task.wait() do
         if tonumber(Result) >= 1750000 then
-            Player:Kick("Auto Farm Protection | Reached Max Money.")
+            Player:Kick("Auto Farm Protection | Reached Max Money : " .. Player.Name)
         return end
         if Settings["IsHealing"] ~= true then
             repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
@@ -890,7 +890,7 @@ local function MainAutofarm()
                 HumanoidRootPart.CFrame = CFrame.new(-36, 4, -24)
                 Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
                 task.wait(.5)
-                repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
+                repeat task.wait(); HumanoidRootPart.CFrame = CFrame.new(-36, 4, -24) until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
                 local PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
                 local PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
                 repeat
