@@ -45,6 +45,7 @@ local Settings = {
     ['Autocrouch Enabled'] = false;
     ["Auto Rejoin"] = false;
     ["Enough Cash"] = false;
+    ["Rejoined"] = true;
 }
 
 task.spawn(function()
@@ -65,7 +66,7 @@ task.spawn(function()
             if tonumber(HourlyRate2) > 1000000 then Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", ""); Settings["Starting Cash"] = tonumber(Result); Result = Settings["Starting Cash"]; end
             if tonumber(Result) > 2500 then
                 Settings["Enough Cash"] = true
-            elseif readfile("AutorejoinerTXT.txt") == true then
+            elseif Settings["Rejoined"] == true then
                 Settings["Enough Cash"] = true
             else
                 Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
