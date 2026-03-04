@@ -1,4 +1,5 @@
 task.spawn(function()
+task.spawn(function()
 repeat task.wait() until game:IsLoaded()
 local VIP = cloneref(game:GetService("VirtualInputManager"))
 local RunService = game:GetService("RunService")
@@ -50,7 +51,6 @@ local Settings = {
 
 task.spawn(function()
     repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
-    repeat task.wait() until PlayerGui:FindFirstChild("Main").Enabled == true
     repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
     repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
     local Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
@@ -368,7 +368,11 @@ end
 local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 
 local function MainAutofarm()
-            print("e")
+    local Animation = Instance.new('Animation')
+    Animation.AnimationId = "rbxassetid://126995783634131"
+    local Track = Humanoid:FindFirstChild('Animator'):LoadAnimation(Animation)
+    Track.Priority = Enum.AnimationPriority.Action4
+    Track:Play()
     Settings["Auto Rejoin"] = true
     writefile("AutorejoinerTXT.txt", "false")
     repeat task.wait() until Settings["Enough Cash"] == true
@@ -1174,6 +1178,8 @@ else
     Settings["Status"] = "[ Startup ] Status: Apartment found."
 end
 
+writefile("AutorejoinerTXT.txt", "true")
+task.wait(.25)
 if readfile("AutorejoinerTXT.txt") == "true" then
     local Player = game.Players.LocalPlayer
     local PlayerGui = Player.PlayerGui
@@ -1195,5 +1201,6 @@ LogService.MessageOut:Connect(function(Message, MessageType)
             loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Autoexecute.lua"))()
         end
     end
+end)
 end)
 end)
