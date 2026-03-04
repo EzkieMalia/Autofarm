@@ -888,7 +888,10 @@ local function MainAutofarm()
                 local PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
                 local PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
                 repeat
-                    HumanoidRootPart.CFrame = CFrame.new(PoorGuy.UpperTorso.Position)
+                    HumanoidRootPart.CFrame = CFrame.new(-36, 4, -24)
+                    repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
+                    PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
+                    PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
                     Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
                     fireproximityprompt(PoorGuyPrompt)
                     task.wait(.05)
