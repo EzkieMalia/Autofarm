@@ -119,7 +119,7 @@ task.spawn(function()
                 Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
             end
         end
-        if HumanoidRootPart.Position.Y <= -10 then
+        if HumanoidRootPart.Position.Y <= -10 or HumanoidRootPart.Position.Y <= 50 then
             HumanoidRootPart.CFrame = CFrame.new(-769, 6, 654)
         end
     end)
