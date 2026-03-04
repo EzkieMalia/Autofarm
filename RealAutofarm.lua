@@ -13,7 +13,7 @@ local Humanoid = Character and Character:FindFirstChild("Humanoid")
 local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
 local Random = Random.new()
 
-writefile("auto_rejoiner.txt", "https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/RealAutofarm.lua")
+writefile("auto_rejoiner.txt", "https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/RealAutofarm.lua")
 task.wait(.05)
 
 if game.PlaceId ~= 15124180230 then
@@ -151,7 +151,7 @@ task.spawn(function()
     Humanoid.Died:Connect(function()
         if Settings["Auto Rejoin"] == true then
             writefile("AutorejoinerTXT.txt", "true")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/Autoexecute.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Autoexecute.lua"))()
         end
     end)
 end)
@@ -1189,7 +1189,7 @@ LogService.MessageOut:Connect(function(Message, MessageType)
             if Settings["Autofarm Enabled"] ~= true then return end
             if Settings["Auto Rejoin"] ~= true then return end
             writefile("AutorejoinerTXT.txt", "true")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/Autoexecute.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Autoexecute.lua"))()
         end
     end
 end)
