@@ -43,6 +43,7 @@ local Settings = {
     ['Autocrouch Enabled'] = false;
     ["Auto Rejoin"] = false;
     ["Enough Cash"] = false;
+    ["Rejoined"] = true;
 }
 
 task.spawn(function()
@@ -62,6 +63,8 @@ task.spawn(function()
             repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabe
             if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
             if tonumber(Result) > 2500 then
+                Settings["Enough Cash"] = true
+            elseif Settings["Rejoined"] == true then
                 Settings["Enough Cash"] = true
             else
                 Settings["Enough Cash"] = false
