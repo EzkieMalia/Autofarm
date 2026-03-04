@@ -368,6 +368,7 @@ end
 local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 
 local function MainAutofarm()
+            print("e")
     Settings["Auto Rejoin"] = true
     writefile("AutorejoinerTXT.txt", "false")
     repeat task.wait() until Settings["Enough Cash"] == true
@@ -1179,11 +1180,9 @@ if readfile("AutorejoinerTXT.txt") == "true" then
     repeat task.wait() until PlayerGui:FindFirstChild("IntroUI") or PlayerGui:FindFirstChild("Main")
     if PlayerGui:FindFirstChild("Main").Enabled == true then
         MainAutofarm()
-        writefile("AutorejoinerTXT.txt", "false")
         return
     end
     MainAutofarm()
-    writefile("AutorejoinerTXT.txt", "false")
     return
 end
 
