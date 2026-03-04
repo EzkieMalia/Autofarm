@@ -1,6 +1,8 @@
 task.spawn(function()
 repeat task.wait() until game:IsLoaded()
 local VIP = cloneref(game:GetService("VirtualInputManager"))
+local RunService = game:GetService("RunService")
+local LogService = cloneref(game:GetService("LogService"))
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = cloneref(game:GetService("Players"))
 local Player = Players.LocalPlayer
@@ -43,7 +45,6 @@ local Settings = {
     ['Autocrouch Enabled'] = false;
     ["Auto Rejoin"] = false;
     ["Enough Cash"] = false;
-    ["Rejoined"] = true;
 }
 
 task.spawn(function()
@@ -64,7 +65,7 @@ task.spawn(function()
             if tonumber(HourlyRate2) > 1000000 then Result = Settings["Starting Cash"]; end
             if tonumber(Result) > 2500 then
                 Settings["Enough Cash"] = true
-            elseif Settings["Rejoined"] == true then
+            elseif readfile("AutorejoinerTXT.txt") == true then
                 Settings["Enough Cash"] = true
             else
                 Settings["Enough Cash"] = false
@@ -361,7 +362,7 @@ local Potato, Flour, Water, Gelatin, SugarBlockBag = ScavengeInventory()
 
 local function MainAutofarm()
     Settings["Auto Rejoin"] = true
-    writefile("AutorejoinerTXT.txt", "true")
+    writefile("AutorejoinerTXT.txt", "false")
     repeat task.wait() until Settings["Enough Cash"] == true
     repeat task.wait() until Settings["IsHealing"] == false
     if Settings["Apartment"] == nil then return end
@@ -888,10 +889,10 @@ local function MainAutofarm()
                 local PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
                 local PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
                 repeat
+                    if Settings["IsHealing"] == true then
+                        repeat task.wait() until Settings["IsHealing"] == false
+                    end
                     HumanoidRootPart.CFrame = CFrame.new(-36, 4, -24)
-                    repeat task.wait() until workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
-                    PoorGuy = workspace:WaitForChild("Folders").NPCs:FindFirstChild("Poor Guy")
-                    PoorGuyPrompt = PoorGuy.UpperTorso.ProximityPrompt
                     Settings["Status"] = "[ Potato Chips ] Status: Turning potato chips into hot chips."
                     fireproximityprompt(PoorGuyPrompt)
                     task.wait(.05)
@@ -1169,4 +1170,15 @@ if readfile("AutorejoinerTXT.txt") == "true" then
     writefile("AutorejoinerTXT.txt", "false")
     return
 end
+
+LogService.MessageOut:Connect(function(Message, MessageType)
+    if MessageType == Enum.MessageType.MessageError then
+        if tostring(Message):match("Server Kick Message:") then
+            if Settings["Autofarm Enabled"] ~= true then return end
+            if Settings["Auto Rejoin"] ~= true then return end
+            writefile("AutorejoinerTXT.txt", "true")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/helloautofarm/refs/heads/main/Autoexecute.lua"))()
+        end
+    end
+end)
 end)
