@@ -69,7 +69,7 @@ task.spawn(function()
             elseif Settings["Rejoined"] == true then
                 Settings["Enough Cash"] = true
             else
-                Settings["Status"] = "[ Startup ] Status: Waiting for a response from the system."
+                Settings["Status"] = "[ Startup ] Status: You don't have atleast 2500 cash, waiting until the system detects you have atleast 2500 cash."
                 Settings["Enough Cash"] = false
             end
             Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
