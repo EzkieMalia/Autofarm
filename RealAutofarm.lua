@@ -108,10 +108,10 @@ task.spawn(function()
             end
         end
     end
-    RunService.RenderStepped:Connect(function()
+    while task.wait() do
         if Humanoid.Health <= 80 or PlayerGui:WaitForChild("Main"):WaitForChild("CombatFrame").Visible == true then
             Settings["IsHealing"] = true
-            Settings["Status"] = "[ Startup ] Status: Healing."
+            Settings["Status"] = "[ Startup ] Status: Waiting for health to reach safe amount before continuing."
             HumanoidRootPart.CFrame = CFrame.new(-769, 6, 654)
         else
             Settings["IsHealing"] = false
@@ -122,7 +122,7 @@ task.spawn(function()
         if HumanoidRootPart.Position.Y <= -10 or HumanoidRootPart.Position.Y <= 50 then
             HumanoidRootPart.CFrame = CFrame.new(-769, 6, 654)
         end
-    end)
+    end
 end)
 
 task.spawn(function()
