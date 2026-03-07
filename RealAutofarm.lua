@@ -62,17 +62,21 @@ task.spawn(function()
     local Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
     Settings["Starting Cash"] = tonumber(Result)
     if isfile("autogc_1" .. Player.Name .. ".txt") and isfile("autogc2_" .. Player.Name .. ".txt") and isfile("autogc3_" .. Player.Name .. ".txt") then
-        if readfile("autogc_1" .. Player.Name .. ".txt") == "true" then
+        local file1 = readfile("autogc_1" .. game.Players.LocalPlayer.Name .. ".txt")
+        if file1 == "true" then
             GoalCashSettings["GoalCash"] = true
         else
             GoalCashSettings["GoalCash"] = false
         end
-        if readfile("autogc_2" .. Player.Name .. ".txt") == "true" then
+        task.wait(.05)
+        local file2 = readfile("autogc_1" .. game.Players.LocalPlayer.Name .. ".txt")
+        if file2 == "true" then
             GoalCashSettings["SaveGoalCashOnExit"] = true
         else
             GoalCashSettings["SaveGoalCashOnExit"] = false
         end
-        if isfile("autogc_3" .. Player.Name .. ".txt") and GoalCashSettings["GoalCash"] == true then
+        local file3 = readfile("autogc_1" .. game.Players.LocalPlayer.Name .. ".txt")
+        if file3 and GoalCashSettings["GoalCash"] == true then
             GoalCashSettings["GoalAmount"] = tonumber(readfile("autogc_3" .. Player.Name .. ".txt"))
         else
             GoalCashSettings["GoalAmount"] = 1750000
