@@ -1203,6 +1203,35 @@ local Button = Tab:CreateButton({
    end,
 })
 
+local Section2 = Tab:CreateSection("Goal System")
+local Toggle = Tab:CreateToggle({
+   Name = "Goal Cash System",
+   CurrentValue = false,
+   Flag = "Toggle3",
+   Callback = function(Value)
+    GoalCashSettings["GoalCash"] = Value
+   end,
+})
+local Toggle = Tab:CreateToggle({
+   Name = "Goal Cash Memory",
+   CurrentValue = false,
+   Flag = "Toggle4",
+   Callback = function(Value)
+    GoalCashSettings["SaveGoalCashOnExit"] = Value
+   end,
+})
+local Slider = Tab:CreateSlider({
+   Name = "Target Cash",
+   Range = {0, 1750000},
+   Increment = 2500,
+   Suffix = "Goal",
+   CurrentValue = 250000,
+   Flag = "Slider1",
+   Callback = function(Value)
+    GoalCashSettings["GoalAmount"] = Value
+   end,
+})
+
 local Paragraph = Tab:CreateParagraph({Title = "Status Information", Content = "[ Startup ] Status: none"})
 local Paragraph2 = Tab:CreateParagraph({Title = "Runtime Information", Content = "Runtime: nil  |  Cycle: nil  |  Money Made: nil"})
 local Paragraph3 = Tab:CreateParagraph({Title = "Sold Information", Content = "Potato Chips Fed: nil | Marshmallows Sold: nil | Credit Cards Used: nil"})
