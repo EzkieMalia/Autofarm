@@ -655,11 +655,11 @@ local function MainAutofarm()
     HumanoidRootPart.CFrame = CFrame.new(PlasticBag.Position)
     Settings["Status"] = "[ Potato Chips ] Status: Bagging potato."
     task.wait(.5)
-    for Index = 1, 4 do
+    for Index = 1,10 do
         fireproximityprompt(PlasticBagPrompt)
         task.wait(.05)
     end
-    task.wait(3)
+    task.wait(2.75)
 
     if Settings["Autofarm Enabled"] ~= true then return end
     Settings["Status"] = "[ Potato Chips ] Status: Mixing flour and potato."
@@ -758,27 +758,27 @@ local function MainAutofarm()
     HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
     Settings["Status"] = "[ Marshmallows ] Status: Adding sugar and gelatin."
     task.wait(.5)
-    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
-    task.wait(.15)
-    for Index = 1,10 do
+    repeat
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag"))
         HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
+        task.wait(.1)
         fireproximityprompt(CookPrompt)
+        task.wait(1.1)
+        Humanoid:UnequipTools()
         task.wait(.05)
-    end
-    task.wait(.25)
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Settings["Potato Counter"] >= 5
+    Settings["Potato Counter"] = 0
+    task.wait(.75)
 
     if Settings["Autofarm Enabled"] ~= true then return end
-    Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Gelatin"))
-    task.wait(.15)
     repeat
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Gelatin"))
         HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
-        task.wait(.25)
-        fireproximityprompt(CookPrompt)
-        task.wait(1)
-        Humanoid:UnequipTools()
         task.wait(.1)
+        fireproximityprompt(CookPrompt)
+        task.wait(1.1)
+        Humanoid:UnequipTools()
+        task.wait(.05)
     until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or Timer.Text == "44"
 
     Settings["Status"] = "[ Cards ] Status: Waiting for card application response."
