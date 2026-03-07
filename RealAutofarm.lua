@@ -33,6 +33,13 @@ local SellInfo
 local HourlyRate
 local HourlyRate2 = "100"
 
+-- //  IMPORTANT!!
+local GoalCashSettings = {
+    ["GoalCash"] = false; -- // Enable this to enable auto kick and the settings below.
+    ["SaveGoalCashOnExit"] = false; -- // If you get disconnected or leave it will memorize the money made.
+    ["GoalAmount"] = 1750000; -- // How much cash should be made before it auto kicks you.
+}
+
 local Settings = {
     ["Status"] = "[ Startup ] Status: Waiting for a response from the system.";
     ["Autofarm Enabled"] = true;
@@ -54,7 +61,46 @@ task.spawn(function()
     repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
     local Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
     Settings["Starting Cash"] = tonumber(Result)
+    if isfile("autogc_1" .. Player.Name .. ".txt") and isfile("autogc2_" .. Player.Name .. ".txt") and isfile("autogc3_" .. Player.Name .. ".txt") then
+        if readfile("autogc_1" .. Player.Name .. ".txt") == "true" then
+            GoalCashSettings["GoalCash"] = true
+        else
+            GoalCashSettings["GoalCash"] = false
+        end
+        if readfile("autogc_2" .. Player.Name .. ".txt") == "true" then
+            GoalCashSettings["SaveGoalCashOnExit"] = true
+        else
+            GoalCashSettings["SaveGoalCashOnExit"] = false
+        end
+        if isfile("autogc_3" .. Player.Name .. ".txt") and GoalCashSettings["GoalCash"] == true then
+            GoalCashSettings["GoalAmount"] = tonumber(readfile("autogc_3" .. Player.Name .. ".txt"))
+        else
+            GoalCashSettings["GoalAmount"] = 1750000
+        end
+    end
+    if isfile("autofarm_" .. Player.Name .. ".txt") then
+        if GoalCashSettings["SaveGoalCashOnExit"] ~= true then
+            delfile("autofarm_" .. Player.Name .. ".txt")
+            delfile("autogc_1" .. Player.Name .. ".txt")
+            delfile("autogc2_" .. Player.Name .. ".txt")
+            delfile("autogc3_" .. Player.Name .. ".txt")
+        else
+            GoalCashSettings["GoalAmount"] = (GoalCashSettings["GoalAmount"] - tonumber(readfile("autofarm_" .. Player.Name .. ".txt")))
+        end
+    end
     while task.wait() do
+        if GoalCashSettings["GoalCash"] == true then
+            if MoneyDifference >= GoalCashSettings["GoalAmount"] then
+                if isfile("autofarm_" .. Player.Name .. ".txt") then
+                    delfile("autofarm_" .. Player.Name .. ".txt")
+                end
+                delfile("autogc_1" .. Player.Name .. ".txt")
+                delfile("autogc2_" .. Player.Name .. ".txt")
+                delfile("autogc3_" .. Player.Name .. ".txt")
+                warn("Goal Cash Reached.")
+                Player:Kick("Auto Farm Protection | Reached Goal Cash : " .. tostring(GetCommaValue(GoalCashSettings["GoalAmount"])) .. " | " .. Player.Name)
+            end
+        end
         if tonumber(Result) >= 1750000 then
             Player:Kick("Auto Farm Protection | Reached Max Money : " .. Player.Name)
         return end
@@ -82,6 +128,22 @@ task.spawn(function()
         local VirtualUser = cloneref(game:GetService("VirtualUser"))
         VirtualUser:CaptureController()
         VirtualUser:ClickButton2(Vector2.new())
+    end)
+    Players.PlayerRemoving:Connect(function(plr)
+        if plr == Player then
+            if GoalCashSettings["GoalCash"] == true then
+                if GoalCashSettings["SaveGoalCashOnExit"] == true then
+                    if isfile("autofarm_" .. Player.Name .. ".txt") then
+                        writefile("autofarm_" .. Player.Name .. ".txt", tostring(MoneyDifference + tonumber(readfile("autofarm_" .. Player.Name .. ".txt"))))
+                    else
+                        writefile("autofarm_" .. Player.Name .. ".txt", tostring(MoneyDifference))
+                    end
+                    writefile("autogc_1" .. Player.Name .. ".txt", tostring(GoalCashSettings["GoalCash"]))
+                    writefile("autogc2_" .. Player.Name .. ".txt", tostring(GoalCashSettings["SaveGoalCashOnExit"]))
+                    writefile("autogc3_" .. Player.Name .. ".txt", tostring(GoalCashSettings["GoalAmount"]))
+                end
+            end
+        end
     end)
     while task.wait() do
         if Settings["Autofarm Enabled"] ~= true then
