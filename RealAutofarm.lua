@@ -712,7 +712,6 @@ local function MainAutofarm()
             task.wait(.05)
         end
     end
-    task.wait(2.25)
 
     if Settings["Autofarm Enabled"] ~= true then return end
     Settings["Status"] = "[ Potato Chips ] Status: Bagging potato."
