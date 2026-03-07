@@ -881,11 +881,12 @@ local function MainAutofarm()
                 for Index, Object in next, Labatory:WaitForChild("Pots"):GetChildren() do
                     HumanoidRootPart.CFrame = CFrame.new(Object.Position)
                     task.wait(.1)
-                    for Index = 1,3 do
+                    for Index = 1,5 do
                         fireproximityprompt(Object.ProximityPrompt)
+                        task.wait(.05)
                     end
-                    task.wait(.1)
                     Humanoid:UnequipTools()
+                    task.wait(.1)
                     if Player:WaitForChild("Backpack"):FindFirstChild("Potato Chips") then
                         break
                     end
@@ -958,7 +959,7 @@ local function MainAutofarm()
                                 end
                                 HumanoidRootPart.CFrame = CFrame.new(UpperTorso.Position)
                                 Settings["Status"] = "[ Potato Chips ] Status: Giving hot chips to homeless."
-                                for Index = 1,2 do
+                                for Index = 1,4 do
                                     if Settings["Autofarm Enabled"] ~= true then return end
                                     if Settings["IsHealing"] == true then
                                         repeat task.wait() until Settings["IsHealing"] == false
