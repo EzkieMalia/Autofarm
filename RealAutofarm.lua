@@ -53,12 +53,14 @@ local Settings = {
     ["Auto Rejoin"] = false;
     ["Enough Cash"] = false;
     ["Rejoined"] = true;
+    ["Busy"] = true;
 }
 
 task.spawn(function()
     repeat task.wait() until PlayerGui:FindFirstChild("Main") :: ScreenGui
     repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money") :: Frame
     repeat task.wait() until PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount") :: TextLabel
+    repeat task.wait() until Settings["Busy"] ~= true
     local Result = string.gsub(PlayerGui:FindFirstChild("Main"):FindFirstChild("Money"):FindFirstChild("Amount").Text, "%D+", "")
     Settings["Starting Cash"] = tonumber(Result)
     if isfile("autogc_1" .. Player.Name .. ".txt") and isfile("autogc_2" .. Player.Name .. ".txt") and isfile("autogc_3" .. Player.Name .. ".txt") then
@@ -102,7 +104,7 @@ task.spawn(function()
                 delfile("autogc_2" .. Player.Name .. ".txt")
                 delfile("autogc_3" .. Player.Name .. ".txt")
                 warn("Goal Cash Reached.")
-                Player:Kick("Auto Farm Protection | Reached Goal Cash : " .. tostring(GetCommaValue(GoalCashSettings["GoalAmount"])) .. " | " .. Player.Name)
+                game.Players.LocalPlayer:Kick("Auto Farm Protection | Reached Goal Cash : " .. tostring(GetCommaValue(GoalCashSettings["GoalAmount"])) .. " | " .. game.Players.LocalPlayer.Name)
             end
         end
         if tonumber(Result) >= 1750000 then
@@ -175,6 +177,7 @@ task.spawn(function()
         end
     end
 end)
+        
 RunService.RenderStepped:Connect(function()
     if Humanoid.Health <= 80 or PlayerGui:WaitForChild("Main"):WaitForChild("CombatFrame").Visible == true then
         Settings["IsHealing"] = true
@@ -366,6 +369,7 @@ local function StartMarshmallowFarm()
             end
         end
         task.wait(.25)
+        Settings["Busy"] = false
         HumanoidRootPart.CFrame = Settings["Old HRP Position"]
         return true
     else
