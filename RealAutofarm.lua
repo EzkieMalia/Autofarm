@@ -835,7 +835,7 @@ local function MainAutofarm()
         task.wait(1.1)
         Humanoid:UnequipTools()
         task.wait(.05)
-    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Settings["Potato Counter"] >= 5
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Pour")
     Settings["Potato Counter"] = 0
     task.wait(.75)
 
@@ -893,7 +893,7 @@ local function MainAutofarm()
             Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag"))
             task.wait(.1)
             fireproximityprompt(CookPrompt)
-            task.wait(.15)
+            task.wait(.25)
             Humanoid:UnequipTools()
             task.wait(.05)
         until not Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag")
