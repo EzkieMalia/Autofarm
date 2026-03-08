@@ -1100,6 +1100,9 @@ local function MainAutofarm()
                         end
                         HumanoidRootPart.CFrame = CFrame.new(ATM.Position)
                         Settings["Status"] = "[ Cards ] Status: Attempting to use blank card."
+                        if PlayerGui:WaitForChild("Main"):FindFirstChild("ATM") then
+                            PlayerGui:WaitForChild("Main"):FindFirstChild("ATM"):Destroy()
+                        end
                         task.wait(.75)
                         repeat
                             if Settings["Autofarm Enabled"] ~= true then return end
