@@ -13,6 +13,12 @@ local Humanoid = Character and Character:FindFirstChild("Humanoid")
 local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
 local Random = Random.new()
 
+local WhitelistSystem = loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Whitelist.lua"))()
+local ReturningWhitelist = WhitelistSystem:Whitelist()
+if ReturningWhitelist ~= true then
+    Player:Kick("Auto Farm Access Denied | The system did not return true.")
+end
+
 writefile("auto_rejoiner.txt", "https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/RealAutofarm.lua")
 task.wait(.05)
 
