@@ -226,6 +226,8 @@ task.spawn(function()
     Humanoid.Died:Connect(function()
         if Settings["Auto Rejoin"] == true then
             writefile("AutorejoinerTXT.txt", "true")
+            GoalCashSettings["SaveGoalCashOnExit"] = true
+            task.wait(.1)
             loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Autoexecute.lua"))()
         end
     end)
@@ -1315,6 +1317,8 @@ LogService.MessageOut:Connect(function(Message, MessageType)
             if Settings["Autofarm Enabled"] ~= true then return end
             if Settings["Auto Rejoin"] ~= true then return end
             writefile("AutorejoinerTXT.txt", "true")
+            GoalCashSettings["SaveGoalCashOnExit"] = true
+            task.wait(.1)
             loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Autoexecute.lua"))()
         end
     end
