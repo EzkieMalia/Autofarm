@@ -48,9 +48,11 @@ local GoalCashSettings = {
     ["Goal Cash"] = false; -- // Enable this to enable auto kick and the settings below.
     ["Memorize Goal"] = false; -- // If you get disconnected or leave it will memorize the money made.
     ["Goal Amount"] = 100000; -- // How much cash should be made before it auto kicks you.
+    ["Extra Cash"] = 0;
 }
 
 local Settings = {
+    ["Ready"] = false;
     ["Rejoined"] = true;
     ["Status"] = "[ START UP ] : Waiting for a response from the system.";
     ["Old HRP Position"] = CFrame.new(HumanoidRootPart.Position);
@@ -107,6 +109,13 @@ local ClearGoalCache = function()
     delfile("AutoFarmMemory4_" .. Player.Name .. ".txt")
 end
 
+local CreateGoalFiles = function()
+    writefile("AutoFarmMemory1_" .. Player.Name .. ".txt", tostring(Data["Cash Change"]))
+    writefile("AutoFarmMemory2_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Goal Amount"]))
+    writefile("AutoFarmMemory3_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Goal Cash"]))
+    writefile("AutoFarmMemory4_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Memorize Goal"]))
+end
+
 local GoalAndHourlyFunction = function()
     repeat task.wait() until PlayerGui:FindFirstChild("Main")
     local Main = PlayerGui:FindFirstChild("Main")
@@ -119,67 +128,68 @@ local GoalAndHourlyFunction = function()
     local Result = string.gsub(Amount.Text, "%D+", "")
     Settings["Starting Cash"] = tonumber(Result)
 
-    if isfile("AutoFarmMemory2_" .. Player.Name .. ".txt") and isfile("AutoFarmMemory3_" .. Player.Name .. ".txt") and isfile("AutoFarmMemory4_" .. Player.Name .. ".txt") then
-        if GoalCashSettings["Memorize Goal"] == true then
-            local MemorizeGoal = readfile("AutoFarmMemory3_" .. Player.Name .. ".txt")
-            if (tostring(MemorizeGoal) == "true") then
-                GoalCashSettings["Memorize Goal"] = true
-                task.wait()
-            end
+    if isfile("AutoFarmMemory3_" .. Player.Name .. ".txt") and isfile("AutoFarmMemory4_" .. Player.Name .. ".txt") then
+        local LastMemory3 = readfile("AutoFarmMemory3_" .. Player.Name .. ".txt")
+        if LastMemory3 == "true" then
+            GoalCashSettings["Goal Cash"] = true
+        else
+            GoalCashSettings["Goal Cash"] = false
+        end
+        task.wait()
+        local LastMemory4 = readfile("AutoFarmMemory4_" .. Player.Name .. ".txt")
+        if LastMemory4 == "true" then
+            GoalCashSettings["Memorize Goal"] = true
+        else
+            GoalCashSettings["Memorize Goal"] = false
+        end
+        task.wait()
+    end
 
-            local GoalCashEnabled = readfile("AutoFarmMemory4_" .. Player.Name .. ".txt")
-            if (tostring(GoalCashEnabled) == "true") then
-                GoalCashSettings["Goal Cash"] = true
-                task.wait()
-            end
-
-            local LastGoal = readfile("AutoFarmMemory2_" .. Player.Name .. ".txt")
-            if (tonumber(LastGoal) ~= nil) then
-                if (GoalCashSettings["Memorize Goal"] == true and GoalCashSettings["Goal Cash"] == true) then
-                    GoalCashSettings["Goal Amount"] = tonumber(LastGoal)
-                end
+    if GoalCashSettings["Goal Cash"] == true and GoalCashSettings["Memorize Goal"] then
+        if isfile("AutoFarmMemory1_" .. Player.Name .. ".txt") and isfile("AutoFarmMemory2_" .. Player.Name .. ".txt") then
+            local LastMemory2 = readfile("AutoFarmMemory2_" .. Player.Name .. ".txt")
+            if LastMemory2 ~= "nil" then
+                GoalCashSettings["Goal Amount"] = tonumber(LastMemory2)
             end
             task.wait()
-        end
-    end
-
-    if isfile("AutoFarmMemory1_" .. Player.Name .. ".txt") then
-        if GoalCashSettings["Memorize Goal"] == true and GoalCashSettings["Goal Cash"] == true then
-            GoalCashSettings["Goal Amount"] = (GoalCashSettings["Goal Amount"] - tonumber(readfile("AutoFarmMemory1_" .. Player.Name .. ".txt")))
-        end
-    end
-
-    while task.wait() do
-        repeat task.wait() until PlayerGui:FindFirstChild("Main")
-        local Main = PlayerGui:FindFirstChild("Main")
-        repeat task.wait() until Main:FindFirstChild("Money")
-        local Money = Main:FindFirstChild("Money")
-        repeat task.wait() until Money:FindFirstChild("Amount")
-        local Amount = Money:FindFirstChild("Amount")
-        Result = string.gsub(Amount.Text, "%D+", "")
-        Data["Cash Change"] = tonumber(Result - Settings["Starting Cash"])
-        if Data["Hourly Rate"] >= 1000000 then
-            Settings["Starting Cash"] = Result
-            Data["Cash Change"] = 0
-        end
-        if (tonumber(Result) >= 1750000) then
-                Player:Kick("Autofarm V2 | " .. Player.Name .. ", you have reached max cash.")
-            return
-        end
-        if GoalCashSettings["Goal Cash"] == true then
-            if (Data["Cash Change"] >= GoalCashSettings["Goal Amount"]) then
-                    Player:Kick("Autofarm V2 | " .. Player.Name .. ", you have reached the desired goal of $" .. tostring(GetCommaValue(GoalCashSettings["Goal Amount"])) .. " after " .. FormatTime(Data["Run Time"]))
-                    delfile("AutoFarmMemory1_" .. Player.Name .. ".txt")
-                    delfile("AutoFarmMemory2_" .. Player.Name .. ".txt")
-                    delfile("AutoFarmMemory3_" .. Player.Name .. ".txt")
-                    delfile("AutoFarmMemory4_" .. Player.Name .. ".txt")
-                return
+            local LastMemory1 = readfile("AutoFarmMemory1_" .. Player.Name .. ".txt")
+            if LastMemory1 ~= "nil" then
+                task.spawn(function()
+                    repeat task.wait() until Settings["Ready"] == true
+                    GoalCashSettings["Extra Cash"] = tonumber(LastMemory1)
+                end)
             end
         end
-        if Settings["Autofarm Enabled"] == true then
-            Data["Run Time"] = (tick() - Start)
-        end
     end
+
+    task.spawn(function()
+        while task.wait() do
+            repeat task.wait() until PlayerGui:FindFirstChild("Main")
+            local Main = PlayerGui:FindFirstChild("Main")
+            repeat task.wait() until Main:FindFirstChild("Money")
+            local Money = Main:FindFirstChild("Money")
+            repeat task.wait() until Money:FindFirstChild("Amount")
+            local Amount = Money:FindFirstChild("Amount")
+            Result = string.gsub(Amount.Text, "%D+", "")
+            Data["Cash Change"] = tonumber(Result - (Settings["Starting Cash"] - GoalCashSettings["Extra Cash"]))
+            if (tonumber(Result) >= 1750000) then
+                    Player:Kick("Autofarm V2 | " .. Player.Name .. ", you have reached max cash.")
+                return
+            end
+            if GoalCashSettings["Goal Cash"] == true then
+                if (Data["Cash Change"] >= GoalCashSettings["Goal Amount"]) then
+                    Player:Kick("Autofarm V2 | " .. Player.Name .. ", you have reached the desired goal of $" .. tostring(GetCommaValue(GoalCashSettings["Goal Amount"])) .. " after " .. FormatTime(Data["Run Time"]))
+                    repeat
+                        ClearGoalCache()
+                    until not isfile("AutoFarmMemory1_" .. Player.Name .. ".txt")
+                    return
+                end
+            end
+            if Settings["Autofarm Enabled"] == true then
+                Data["Run Time"] = (tick() - Start)
+            end
+        end
+    end)
 end
 task.spawn(GoalAndHourlyFunction)
 
@@ -194,14 +204,7 @@ local AfkAndLeaverHandler = function()
     Players.PlayerRemoving:Connect(function(plr)
         if (plr == Player) then
             if (GoalCashSettings["Goal Cash"] == true and GoalCashSettings["Memorize Goal"] == true) then
-                writefile("AutoFarmMemory2_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Goal Amount"]))
-                writefile("AutoFarmMemory4_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Goal Cash"]))
-                writefile("AutoFarmMemory3_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Memorize Goal"]))
-                if isfile("AutoFarmMemory1_" .. Player.Name .. ".txt") then
-                    writefile("AutoFarmMemory1_" .. Player.Name .. ".txt", tostring(GoalCashSettings["Goal Amount"] - Data["Cash Change"]))
-                else
-                    writefile("AutoFarmMemory1_" .. Player.Name .. ".txt", tostring(Data["Cash Change"]))
-                end
+                CreateGoalFiles()
             end
         end
     end)
@@ -237,6 +240,8 @@ end)
 task.spawn(function()
     Humanoid.Died:Connect(function()
         if Settings["Auto Rejoin"] == true then
+            CreateGoalFiles()
+            task.wait()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Teleporter.lua"))()
         end
     end)
@@ -805,13 +810,14 @@ local BagMarshmallowAndSell = function()
     repeat
         HumanoidRootPart.CFrame = CFrame.new(Stove.Position)
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag"))
-        task.wait(.5)
-        for Index = 1,15 do
-            fireproximityprompt(CookPrompt)
-            task.wait(.05)
-        end
+        task.wait(.75)
+        fireproximityprompt(CookPrompt)
+        task.wait(.25)
+        local oldhealth = Humanoid.Health
+        Humanoid.Health = 70
         Humanoid:UnequipTools()
         task.wait(.25)
+        Humanoid.Health = oldhealth
     until Player:WaitForChild("Backpack"):FindFirstChild("Small Marshmallow Bag") or Player:WaitForChild("Backpack"):FindFirstChild("Medium Marshmallow Bag") or Player:WaitForChild("Backpack"):FindFirstChild("Large Marshmallow Bag")
     repeat 
         if Settings["Autofarm Enabled"] ~= true then
@@ -1295,6 +1301,7 @@ local ClaimAndUseCard = function()
 end
 
 local function MainAutofarmController()
+    repeat task.wait() until Settings["Ready"] == true
     local CardWaitTime = 1
     local Animation = Instance.new('Animation')
     Animation.AnimationId = "rbxassetid://126995783634131"
@@ -1345,10 +1352,10 @@ local function MainAutofarmController()
     BagPotato()
     MixFlourAndPotato()
     local PotSuccessful = CookPotatoChips()
-    local CardApplication = ApplyForCard()
+    ApplyForCard()
     AddSugarAndGelatin()
 
-    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or CardApplication = false or CardApplication = true
+    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful."
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         PurchaseFakeID()
         ApplyForCard()
@@ -1369,7 +1376,7 @@ local function MainAutofarmController()
             Settings["Status"] = "[ CARDS ] : ATM not available, skipping cards."
         end
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
-        repeat task.wait() until CookTimer.Text == "0"
+        repeat task.wait() until StoveTimer.Text == "0"
         BagMarshmallowAndSell()
         Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
         repeat task.wait() until PotTimer.Text == "0"
@@ -1379,7 +1386,7 @@ local function MainAutofarmController()
         end
     elseif (CardWaitTime == 2) then
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
-        repeat task.wait() until CookTimer.Text == "0"
+        repeat task.wait() until StoveTimer.Text == "0"
         BagMarshmallowAndSell()
         Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
         repeat task.wait() until PotTimer.Text == "0"
@@ -1390,7 +1397,7 @@ local function MainAutofarmController()
         ClaimAndUseCard()
     else
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
-        repeat task.wait() until PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag the")
+        repeat task.wait() until StoveTimer.Text == "0"
         BagMarshmallowAndSell()
         Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
         repeat task.wait() until PotTimer.Text == "0"
@@ -1402,7 +1409,6 @@ local function MainAutofarmController()
     Data["Cycles"] += 1
     MainAutofarmController()
 end
-task.spawn(MainAutofarmController)
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -1524,7 +1530,10 @@ local Paragraph2 = Tab:CreateParagraph({Title = "Runtime Information", Content =
 local Paragraph3 = Tab:CreateParagraph({Title = "Sold Information", Content = "Potato Chips Fed: nil | Marshmallows Sold: nil | Credit Cards Used: nil"})
 local Paragraph4 = Tab:CreateParagraph({Title = "Hourly Rate Information", Content = "Hourly Rate: nil"})
 local Paragraph5 = Tab2:CreateParagraph({Title = "Estimated Time Information", Content = "Estimated Time: nil"})
-
+Slider2:Set(GoalCashSettings["Goal Amount"])
+Toggle3:Set(GoalCashSettings["Goal Cash"])
+Toggle4:Set(GoalCashSettings["Memorize Goal"])
+task.spawn(MainAutofarmController)
 task.spawn(function()
     while task.wait() do
         Data["Run Time"] = os.clock() - Start
@@ -1555,6 +1564,7 @@ task.spawn(function()
         getconnections(PlayButton.MouseButton1Click)[1]:Fire()
         task.wait(.25)
     until not PlayerGui:FindFirstChild("IntroUI")
+    Settings["Ready"] = true
 end)
 
 if not Authentication then
