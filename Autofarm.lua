@@ -457,7 +457,6 @@ local function StartMarshmallowFarm()
                 HumanoidRootPart.CFrame = CFrame.new(Lock.Part.Position)
                 fireproximityprompt(Lock.Part.ProximityPrompt)
                 task.wait(.25)
-                fireproximityprompt(KnobPrompt)
             until Lock.Part.Rotation.X == 90 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "You do not have permission to interact with this."
             if PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 then
                 task.spawn(StartMarshmallowFarm)
@@ -1545,7 +1544,7 @@ task.spawn(function()
     local IntroUI = PlayerGui:FindFirstChild("IntroUI")
     repeat task.wait() until IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
     local PlayButton = IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
-    task.wait(5)
+    task.wait(15)
     repeat
         getconnections(PlayButton.MouseButton1Click)[1]:Fire()
         task.wait(.25)
