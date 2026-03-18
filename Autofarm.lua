@@ -1531,8 +1531,16 @@ local Paragraph3 = Tab:CreateParagraph({Title = "Sold Information", Content = "P
 local Paragraph4 = Tab:CreateParagraph({Title = "Hourly Rate Information", Content = "Hourly Rate: nil"})
 local Paragraph5 = Tab2:CreateParagraph({Title = "Estimated Time Information", Content = "Estimated Time: nil"})
 Slider2:Set(GoalCashSettings["Goal Amount"])
-Toggle3:Set(GoalCashSettings["Goal Cash"])
-Toggle4:Set(GoalCashSettings["Memorize Goal"])
+if GoalCashSettings["Goal Cash"] == true then
+    Toggle3:Set(true)
+else
+    Toggle3:Set(false)
+end
+if GoalCashSettings["Memorize Goal"] == true then
+    Toggle4:Set(true)
+else
+    Toggle4:Set(false)
+end
 task.spawn(MainAutofarmController)
 task.spawn(function()
     while task.wait() do
