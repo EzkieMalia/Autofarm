@@ -1215,11 +1215,14 @@ local ApplyForCard = function()
         HumanoidRootPart.CFrame = CFrame.new(-48, 4, -315)
         Settings["Status"] = "[ CARDS ] : Attempting to apply for a credit card."
         Humanoid:EquipTool(Player:WaitForChild("Backpack"):FindFirstChild("Fake ID"))
-        task.wait(.5)
+        task.wait(.75)
         fireproximityprompt(BankPrompt)
-        task.wait(.45)
+        task.wait(.5)
+        local oldhealth = Humanoid.Health
+        Humanoid.Health = 70
         Humanoid:UnequipTools()
-        task.wait(.05)
+        task.wait(.25)
+        Humanoid.Health = oldhealth
         Settings["Safety Counter"] += 1
     until not Player:WaitForChild("Backpack"):FindFirstChild("Fake ID") or Settings["Safety Counter"] >= 15
     if Settings["Safety Counter"] >= 15 then
@@ -1355,11 +1358,11 @@ local function MainAutofarmController()
     ApplyForCard()
     AddSugarAndGelatin()
 
-    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful."
+    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag")
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         PurchaseFakeID()
         ApplyForCard()
-        repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful."
+        repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag")
         if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         elseif PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." then
             CardWaitTime = 2
