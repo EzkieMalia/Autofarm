@@ -1348,7 +1348,7 @@ local function MainAutofarmController()
     local CardApplication = ApplyForCard()
     AddSugarAndGelatin()
 
-    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or CardApplication = false
+    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or CardApplication = false or CardApplication = true
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         PurchaseFakeID()
         ApplyForCard()
