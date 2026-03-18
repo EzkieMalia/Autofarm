@@ -1216,7 +1216,12 @@ local ApplyForCard = function()
         task.wait(.05)
         Settings["Safety Counter"] += 1
     until not Player:WaitForChild("Backpack"):FindFirstChild("Fake ID") or Settings["Safety Counter"] >= 15
+    if Settings["Safety Counter"] >= 15 then
+        Settings["Safety Counter"] = 0
+        return false
+    end
     Settings["Safety Counter"] = 0
+    return true
 end
 
 local ClaimAndUseCard = function()
@@ -1340,10 +1345,10 @@ local function MainAutofarmController()
     BagPotato()
     MixFlourAndPotato()
     local PotSuccessful = CookPotatoChips()
-    ApplyForCard()
+    local CardApplication = ApplyForCard()
     AddSugarAndGelatin()
 
-    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful."
+    repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or CardApplication = false
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         PurchaseFakeID()
         ApplyForCard()
