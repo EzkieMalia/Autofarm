@@ -206,6 +206,9 @@ local AfkAndLeaverHandler = function()
         end
     end)
     while task.wait() do
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+        task.wait()
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
         if Settings["Autofarm Enabled"] ~= true then
             Settings["Status"] = "[ START UP ] : Autofarm is currently yielding."
         end
@@ -214,8 +217,6 @@ end
 task.spawn(AfkAndLeaverHandler)
 
 RunService.RenderStepped:Connect(function()
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
     if Humanoid.Health <= 80 or PlayerGui:WaitForChild("Main"):WaitForChild("CombatFrame").Visible == true then
         Settings["IsHealing"] = true
         Settings["Status"] = "[ ANTI-DEATH ] : Waiting until health is above 80."
@@ -1099,7 +1100,7 @@ local ClaimPotatoChipsAndSell = function()
         task.wait()
     until Player:WaitForChild("Backpack"):FindFirstChild("Hot Chips")
     Settings["Status"] = "[ POTATO CHIPS ] : Avoiding server kick, yielding."
-    task.wait(3)
+    task.wait(4)
     Settings["Status"] = "[ POTATO CHIPS ] : Giving Hot Chips to homeless people."
     local AvailableHomeless = FindAvailableHomeless()
     if #AvailableHomeless ~= 0 then
