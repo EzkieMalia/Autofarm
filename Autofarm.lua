@@ -214,6 +214,8 @@ end
 task.spawn(AfkAndLeaverHandler)
 
 RunService.RenderStepped:Connect(function()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
     if Humanoid.Health <= 80 or PlayerGui:WaitForChild("Main"):WaitForChild("CombatFrame").Visible == true then
         Settings["IsHealing"] = true
         Settings["Status"] = "[ ANTI-DEATH ] : Waiting until health is above 80."
@@ -1480,7 +1482,7 @@ local Slider2 = Tab2:CreateSlider({
    CurrentValue = 100000,
    Flag = "Slider1",
    Callback = function(Value)
-    GoalCashSettings["GoalAmount"] = Value
+    GoalCashSettings["Goal Amount"] = Value
    end,
 })
 local Input = Tab2:CreateInput({
@@ -1494,10 +1496,10 @@ local Input = Tab2:CreateInput({
         Slider2:Set(100000)
     else
         if tonumber(Text) >= 0 and tonumber(Text) <= 1750000 then
-            GoalCashSettings["GoalCash"] = tonumber(Text)
+            GoalCashSettings["Goal Amount"] = tonumber(Text)
             Slider2:Set(tonumber(Text))
         else
-            GoalCashSettings["GoalCash"] = 100000
+            GoalCashSettings["Goal Amount"] = 100000
             Slider2:Set(100000)
         end
     end
