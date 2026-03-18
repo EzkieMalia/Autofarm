@@ -1369,7 +1369,7 @@ local function MainAutofarmController()
             Settings["Status"] = "[ CARDS ] : ATM not available, skipping cards."
         end
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
-        repeat task.wait() until PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag the")
+        repeat task.wait() until CookTimer.Text == "0"
         BagMarshmallowAndSell()
         Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
         repeat task.wait() until PotTimer.Text == "0"
@@ -1379,7 +1379,7 @@ local function MainAutofarmController()
         end
     elseif (CardWaitTime == 2) then
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
-        repeat task.wait() until PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag the")
+        repeat task.wait() until CookTimer.Text == "0"
         BagMarshmallowAndSell()
         Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
         repeat task.wait() until PotTimer.Text == "0"
@@ -1387,6 +1387,7 @@ local function MainAutofarmController()
         if (PotatoSellAttempt == false) then
             Settings["Status"] = "[ POTATO CHIPS ] : POTATO ERROR, skipping Potato Chips."
         end
+        ClaimAndUseCard()
     else
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
         repeat task.wait() until PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag the")
