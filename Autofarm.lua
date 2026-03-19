@@ -1534,6 +1534,22 @@ local Paragraph2 = Tab:CreateParagraph({Title = "Runtime Information", Content =
 local Paragraph3 = Tab:CreateParagraph({Title = "Sold Information", Content = "Potato Chips Fed: nil | Marshmallows Sold: nil | Credit Cards Used: nil"})
 local Paragraph4 = Tab:CreateParagraph({Title = "Hourly Rate Information", Content = "Hourly Rate: nil"})
 local Paragraph5 = Tab2:CreateParagraph({Title = "Estimated Time Information", Content = "Estimated Time: nil"})
+task.spawn(function()
+    if (Settings["Rejoined"] == true) then
+        Settings["Autofarm Enabled"] = true
+        Toggle:Set(true)
+    end
+    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI")
+    local IntroUI = PlayerGui:FindFirstChild("IntroUI")
+    repeat task.wait() until IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
+    local PlayButton = IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
+    task.wait(15)
+    repeat
+        getconnections(PlayButton.MouseButton1Click)[1]:Fire()
+        task.wait(.25)
+    until not PlayerGui:FindFirstChild("IntroUI")
+    Settings["Ready"] = true
+end)
 repeat task.wait() until Settings["Ready"] == true
 Slider2:Set(GoalCashSettings["Goal Amount"])
 if GoalCashSettings["Goal Cash"] == true then
@@ -1563,23 +1579,6 @@ task.spawn(function()
         Paragraph4:Set({Title = "Hourly Rate Information", Content = HourlyRate})
         Paragraph5:Set({Title = "Estimated Time Information", Content = EstimatedTime})
     end
-end)
-
-task.spawn(function()
-    if (Settings["Rejoined"] == true) then
-        Settings["Autofarm Enabled"] = true
-        Toggle:Set(true)
-    end
-    repeat task.wait() until PlayerGui:FindFirstChild("IntroUI")
-    local IntroUI = PlayerGui:FindFirstChild("IntroUI")
-    repeat task.wait() until IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
-    local PlayButton = IntroUI:FindFirstChild("SurfaceGui"):FindFirstChild("Frame"):FindFirstChild("Play")
-    task.wait(15)
-    repeat
-        getconnections(PlayButton.MouseButton1Click)[1]:Fire()
-        task.wait(.25)
-    until not PlayerGui:FindFirstChild("IntroUI")
-    Settings["Ready"] = true
 end)
 
 if not Authentication then
