@@ -52,6 +52,7 @@ local GoalCashSettings = {
 }
 
 local Settings = {
+    ["Deleting"] = false;
     ["Ready"] = false;
     ["Rejoined"] = true;
     ["Status"] = "[ START UP ] : Waiting for a response from the system.";
@@ -178,6 +179,7 @@ local GoalAndHourlyFunction = function()
             end
             if GoalCashSettings["Goal Cash"] == true then
                 if (Data["Cash Change"] >= GoalCashSettings["Goal Amount"]) then
+                    Settings["Deleting"] = true
                     Player:Kick("Autofarm V2 | " .. Player.Name .. ", you have reached the desired goal of $" .. tostring(GetCommaValue(GoalCashSettings["Goal Amount"])) .. " after " .. FormatTime(Data["Run Time"]))
                     repeat
                         ClearGoalCache()
@@ -205,7 +207,11 @@ local AfkAndLeaverHandler = function()
     Players.PlayerRemoving:Connect(function(plr)
         if (plr == Player) then
             if (GoalCashSettings["Goal Cash"] == true and GoalCashSettings["Memorize Goal"] == true) then
-                CreateGoalFiles()
+                task.wait()
+                task.wait()
+                if Settings["Deleting"] ~= true then
+                    CreateGoalFiles()
+                end
             end
         end
     end)
@@ -1553,13 +1559,11 @@ end)
 repeat task.wait() until Settings["Ready"] == true
 Slider2:Set(GoalCashSettings["Goal Amount"])
 if GoalCashSettings["Goal Cash"] == true then
-    warn('e')
     Toggle3:Set(true)
 else
     Toggle3:Set(false)
 end
 if GoalCashSettings["Memorize Goal"] == true then
-    warn('e')
     Toggle4:Set(true)
 else
     Toggle4:Set(false)
