@@ -207,7 +207,6 @@ local AfkAndLeaverHandler = function()
     Players.PlayerRemoving:Connect(function(plr)
         if (plr == Player) then
             if (GoalCashSettings["Goal Cash"] == true and GoalCashSettings["Memorize Goal"] == true) then
-                task.wait()
                 if Settings["Deleting"] ~= true then
                     CreateGoalFiles()
                 end
