@@ -1589,8 +1589,8 @@ task.spawn(function()
         Data["Run Time"] = os.clock() - Start
         local Information = "Runtime: " .. tostring(FormatTime(Data["Run Time"])) .. "  |  Cycle: " .. tostring(Data["Cycles"]) .. "  |  Money Made: " .. tostring(GetCommaValue(Data["Cash Change"])) .. " Cash"
         local SellInfo = "Potato Chips Fed: " .. Settings["Potato Counter"] .. " | Marshmallows Sold: " .. Settings["Marshmallow Counter"] .. " | Credit Cards Used: " .. Settings["Cards Counter"]
-        local HourlyRate = "Current Hourly Rate Estimated: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Data["Run Time"]) * Data["Cash Change"]))) .. " Cash"
-        local HourlyRate2 = tostring(math.floor(3600/math.floor(Data["Run Time"]) * Data["Cash Change"]))
+        local HourlyRate = "Current Hourly Rate Estimated: " .. tostring(GetCommaValue(math.floor(3600/math.floor(Data["Run Time"]) * (Data["Cash Change"]) - GoalCashSettings["Extra Cash"]))) .. " Cash"
+        local HourlyRate2 = tostring(math.floor(3600/math.floor(Data["Run Time"]) * (Data["Cash Change"] - GoalCashSettings["Extra Cash"])))
         local EstimatedTime = "Estimated Time Until Goal: " .. tostring(FormatTime(((GoalCashSettings["Goal Amount"] - tonumber(Data["Cash Change"]))/tonumber(HourlyRate2)) * 3600)) .. " Left"
         Paragraph:Set({Title = "Status Information", Content = Settings["Status"]})
         Paragraph2:Set({Title = "Runtime Information", Content = Information})
