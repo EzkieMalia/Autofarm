@@ -1597,6 +1597,17 @@ task.spawn(function()
         Paragraph5:Set({Title = "Estimated Time Information", Content = EstimatedTime})
     end
 end)
+task.spawn(function()
+    LogService.MessageOut:Connect(function(Message, MessageType)
+        if (MessageType == Enum.MessageType.MessageError) then
+            if (tostring(Message):match("Server Kick Message:")) then
+                CreateGoalFiles()
+                task.wait()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/EzkieMalia/Autofarm/refs/heads/main/Teleporter.lua"))()
+            end
+        end
+    end)
+end)
 
 if not Authentication then
     Player:Kick("Skid Protection.")
