@@ -1365,13 +1365,16 @@ local function MainAutofarmController()
     ApplyForCard()
     AddSugarAndGelatin()
 
+    Settings["Status"] = "[ CARDS ] : Waiting on application status."
     repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag")
     if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         PurchaseFakeID()
         ApplyForCard()
+        Settings["Status"] = "[ CARDS ] : Waiting on application status."
         repeat task.wait() until PlayerGui:WaitForChild("Main").BasicNotification.TextTransparency == 0 or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." or PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Bag")
         if PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was unsuccessful." then
         elseif PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." then
+            Settings["Status"] = "[ CARDS ] : Application was successful, waiting for Marshmallow to finish cooking."
             CardWaitTime = 2
         end
     elseif PlayerGui:WaitForChild("Main").BasicNotification.Text == "Your application was successful. Please allow 30 seconds for the bank to prepare your card." then
