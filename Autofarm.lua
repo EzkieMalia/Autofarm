@@ -137,7 +137,7 @@ local GoalAndHourlyFunction = function()
         end
         task.wait()
         local LastMemory4 = readfile("AutoFarmMemory4_" .. Player.Name .. ".txt")
-        if tostring(LastMemory4) == true then
+        if tostring(LastMemory4) == "true" then
             GoalCashSettings["Memorize Goal"] = true
         else
             GoalCashSettings["Memorize Goal"] = false
