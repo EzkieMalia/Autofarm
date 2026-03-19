@@ -208,7 +208,6 @@ local AfkAndLeaverHandler = function()
         if (plr == Player) then
             if (GoalCashSettings["Goal Cash"] == true and GoalCashSettings["Memorize Goal"] == true) then
                 task.wait()
-                task.wait()
                 if Settings["Deleting"] ~= true then
                     CreateGoalFiles()
                 end
