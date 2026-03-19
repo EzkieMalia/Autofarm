@@ -1233,11 +1233,23 @@ local ApplyForCard = function()
         Settings["Safety Counter"] += 1
     until not Player:WaitForChild("Backpack"):FindFirstChild("Fake ID") or Settings["Safety Counter"] >= 15
     if Settings["Safety Counter"] >= 15 then
-        Settings["Safety Counter"] = 0
-        return false
+        local Card = workspace:WaitForChild("CardPickup")
+        local CardPrompt = Card.Attachment.ProximityPrompt
+        if Settings["Autofarm Enabled"] ~= true then
+            repeat task.wait() until Settings["Autofarm Enabled"] == true
+        end
+        if Settings["IsHealing"] == true then
+            repeat task.wait() until Settings["IsHealing"] ~= true
+        end
+        Settings["Status"] = "[ CARDS ] : Attempting to claim credit card."
+        for Index = 1, 10 do
+            HumanoidRootPart.CFrame = CFrame.new(Card.Position)
+            fireproximityprompt(CardPrompt)
+            task.wait(.05)
+            Humanoid:UnequipTools()
+        end
     end
     Settings["Safety Counter"] = 0
-    return true
 end
 
 local ClaimAndUseCard = function()
