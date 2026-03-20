@@ -1246,6 +1246,10 @@ local ApplyForCard = function()
             task.wait(.05)
             Humanoid:UnequipTools()
         end
+        if Player:WaitForChild("Backpack"):FindFirstChild("Card") then
+            Settings["Safety Counter"] = 0
+            return true
+        end
     end
     Settings["Safety Counter"] = 0
 end
@@ -1372,7 +1376,7 @@ local function MainAutofarmController()
     BagPotato()
     MixFlourAndPotato()
     local PotSuccessful = CookPotatoChips()
-    ApplyForCard()
+    local CardSuccessful = ApplyForCard()
     AddSugarAndGelatin()
 
     Settings["Status"] = "[ CARDS ] : Waiting on application status."
@@ -1418,6 +1422,17 @@ local function MainAutofarmController()
             Settings["Status"] = "[ POTATO CHIPS ] : POTATO ERROR, skipping Potato Chips."
         end
         ClaimAndUseCard()
+    elseif CardSuccessful == true then
+        ClaimAndUseCard()
+        Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
+        repeat task.wait() until StoveTimer.Text == "0"
+        BagMarshmallowAndSell()
+        Settings["Status"] = "[ POTATO CHIPS ] : Waiting for Potato Chips to finish cooking."
+        repeat task.wait() until PotTimer.Text == "0"
+        local PotatoSellAttempt = ClaimPotatoChipsAndSell()
+        if (PotatoSellAttempt == false) then
+            Settings["Status"] = "[ POTATO CHIPS ] : POTATO ERROR, skipping Potato Chips."
+        end
     else
         Settings["Status"] = "[ MARSHMALLOW ] : Waiting for Marshmallow to finish cooking."
         repeat task.wait() until StoveTimer.Text == "0"
