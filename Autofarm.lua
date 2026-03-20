@@ -195,6 +195,15 @@ local GoalAndHourlyFunction = function()
     end)
 end
 task.spawn(GoalAndHourlyFunction)
+task.spawn(function()
+    if Settings["Autofarm Enabled"] == true then
+        while task.wait(.5) do
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, nil)
+            task.wait(.5)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, nil)
+        end
+    end
+end)
 
 local AfkAndLeaverHandler = function()
     Player.Idled:Connect(function()
@@ -781,7 +790,7 @@ local AddSugarAndGelatin = function()
         Humanoid:UnequipTools()
         task.wait(.1)
         Settings["Safety Counter"] += 1
-    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag") or Settings["Safety Counter"] >= 5
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag") or Settings["Safety Counter"] >= 4
     Settings["Safety Counter"] = 0
 
     Settings["Status"] = "[ MARSHMALLOW ] : Pouring Gelatin into the pot."
@@ -800,7 +809,7 @@ local AddSugarAndGelatin = function()
         Humanoid:UnequipTools()
         task.wait(.1)
         Settings["Safety Counter"] += 1
-    until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Let") or Settings["Safety Counter"] >= 5
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Let") or Settings["Safety Counter"] >= 4
     Settings["Safety Counter"] = 0
 end
 
