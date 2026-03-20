@@ -781,7 +781,7 @@ local AddSugarAndGelatin = function()
         Humanoid:UnequipTools()
         task.wait(.1)
         Settings["Safety Counter"] += 1
-    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Settings["Safety Counter"] >= 5
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Sugar Block Bag") or Player:WaitForChild("Backpack"):FindFirstChild("Empty Bag") or Settings["Safety Counter"] >= 4
     Settings["Safety Counter"] = 0
 
     Settings["Status"] = "[ MARSHMALLOW ] : Pouring Gelatin into the pot."
@@ -800,7 +800,7 @@ local AddSugarAndGelatin = function()
         Humanoid:UnequipTools()
         task.wait(.1)
         Settings["Safety Counter"] += 1
-    until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Let") or Settings["Safety Counter"] >= 5
+    until not Player:WaitForChild("Backpack"):FindFirstChild("Gelatin") or PlayerGui:WaitForChild("Main").TaskUpdate.TextLabel.Text:match("Let") or Settings["Safety Counter"] >= 4
     Settings["Safety Counter"] = 0
 end
 
